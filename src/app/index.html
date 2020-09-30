@@ -1,23 +1,25 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="Content/css/reko.css" />
     <script src="Content/js/jquery.min.js"></script>
     <style>
         #klikme {
-            border: solid 1px black
+            border: solid 1px black;
+            display: inline-block;
+            cursor: pointer
         }
 
         #klikme:hover {
-            background-color: #FFEEEE
+            background-color: #802D2D
         }
     </style>
 </head>
 <body>
     <input id="loadfile" type="file" button="Load image" />
-    Hello world.
-    <div id="klikme">Klikme</div>
+    <div id="klikme">Disassemble some random X86 code</div>
     <br />
-    <div id="dasmWin" >
+    <div id="dasmWin" class="reko-dasm">
 
     </div>
     <script type="text/javascript">

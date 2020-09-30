@@ -1,0 +1,21 @@
+﻿body {
+    background-color:#2D2D30;
+    color:#DDDDDD;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.reko-dasm {
+    border: solid 1px #CCCCCC;
+    padding: 3px;
+}
+
+.reko-dasm .mnem {
+    font-weight:bold;
+    padding-right:0.5em;
+    display:inline-block;
+    width:7em;
+}
+
+.reko-dasm .addr {
+
+}

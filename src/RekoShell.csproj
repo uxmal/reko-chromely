@@ -10,10 +10,13 @@
 
   <ItemGroup>
     <PackageReference Include="Chromely" Version="5.1.83-pre02" />
-    <PackageReference Include="Reko.Decompiler.Runtime" Version="0.9.2" />
+    <PackageReference Include="Reko.Decompiler.Runtime" Version="0.9.2-prerelease" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="app\Content\css\reko.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="app\Content\js\jquery.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
