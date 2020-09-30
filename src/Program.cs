@@ -21,51 +21,18 @@
 // THE SOFTWARE.
 #endregion
 
-using Chromely;
-using Chromely.Core;
-using Chromely.Core.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Reko.Chromely.BrowserHost;
 using System;
 
 namespace Reko.Chromely
 {
-    class Program
+	class Program
     {
         [STAThread]
         static void Main(string[] args)
         {
-            var config = DefaultConfiguration.CreateForRuntimePlatform();
-            //config.StartUrl = "https://google.com";
-            config.StartUrl = "local://app/index.html";
-
-            AppBuilder.Create()
-                .UseApp<RekoApp>()
-                .UseConfig<DefaultConfiguration>(config)
-                .UseWindow<RekoWindow>()
-                .Build()
-                .Run(args);
-        }
-    }
-
-    public class RekoApp : ChromelyBasicApp
-    {
-        public RekoApp()
-        {
-        }
-
-        public override void ConfigureServices(ServiceCollection services)
-        {
-            base.ConfigureServices(services);
-
-            services.AddSingleton<Xilium.CefGlue.CefDisplayHandler, RekoDisplayHandler>();
-            RegisterControllerAssembly(services, typeof(RekoApp).Assembly);
-        }
-    }
-
-    public class RekoDisplayHandler : Xilium.CefGlue.CefDisplayHandler
-    {
-        public RekoDisplayHandler()
-        {
+            var host = new RekoBrowserHost();
+            host.Start();
         }
     }
 

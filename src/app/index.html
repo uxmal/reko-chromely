@@ -34,23 +34,7 @@
         }
 
         function executeRun() {
-            //var content = document.getElementById("demoscript").value;
-            var postData = { "framename": "alldemoframe", "script": "@@@content" };
-            var request = {
-                "method": "POST",
-                "url": "/executejavascript/execute",
-                "parameters": null,
-                "postData": JSON.stringify(postData),
-            };
-
-            window.cefQuery({
-                request: JSON.stringify(request),
-                onSuccess: function (response) {
-                    response = JSON.parse(response);
-                }, onFailure: function (err, msg) {
-                    console.log(err, msg);
-                }
-            });
+            window.ExecuteJavascript();
         }
     </script>
 
