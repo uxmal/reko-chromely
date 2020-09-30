@@ -11,6 +11,9 @@ using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost.Functions
 {
+    /// <summary>
+    /// Background task that executes asynchronous operations
+    /// </summary>
 	public class ExecuteJavascriptTask : CefTask
 	{
         private readonly CefV8Context ctx;
@@ -18,12 +21,17 @@ namespace Reko.Chromely.BrowserHost.Functions
             ctx = context;
 		}
 
+        /// <summary>
+        /// Send the resulting disassembly to the browser
+        /// by calling a JS function
+        /// </summary>
+        /// <param name="dasm"></param>
         private void SendToClient(string dasm) {
             ctx.Enter();
             var glbl = ctx.GetGlobal();
 
+            // invoke JS function
             var argString = CefV8Value.CreateString(dasm);
-
             var onScanComplete = glbl.GetValue("OnScanComplete");
             onScanComplete.ExecuteFunction(null, new CefV8Value[] { argString });
 
@@ -49,12 +57,20 @@ namespace Reko.Chromely.BrowserHost.Functions
         }
 	}
 
+    /// <summary>
+    /// Synchronous handler for the function call
+    /// </summary>
 	public class ExecuteJavascript : CefV8Handler
 	{
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception) {
             returnValue = CefV8Value.CreateNull();
             exception = null;
 
+            /**
+             * this handler is synchronous, so we create an asynchronous task on the render thread.
+             * the task is given the current execution context
+             * so that the task can call-back into JS code when it wants to
+             **/
             var task = new ExecuteJavascriptTask(CefV8Context.GetCurrentContext());
             CefTaskRunner.GetForCurrentThread().PostTask(task);
 

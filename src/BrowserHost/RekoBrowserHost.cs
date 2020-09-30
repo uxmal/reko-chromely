@@ -50,6 +50,11 @@ namespace Reko.Chromely.BrowserHost
 			CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
 		}
 
+		/// <summary>
+		/// Creates the window construction parameters
+		/// <see cref="CefWindowInfo"/> describes how we want the window to be created
+		/// </summary>
+		/// <returns></returns>
 		private static CefWindowInfo CreateWindowInfo() {
 			var windowInfo = CefWindowInfo.Create();
 			windowInfo.SetAsPopup(IntPtr.Zero, WINDOW_TITLE);
@@ -80,10 +85,14 @@ namespace Reko.Chromely.BrowserHost
 			this.app = new RekoBrowserApp(config);
 			InitializeRuntime();
 
+			// Obtain the html url relative to the executing assembly
 			var baseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
 			initialUrl = Path.Combine(baseDirectory!, "app", "index.html");
 		}
 
+		/// <summary>
+		/// Create the browser and start the blocking message loop
+		/// </summary>
 		public void Start() {
 			this.browser = CreateBrowserObject();
 
@@ -107,6 +116,11 @@ namespace Reko.Chromely.BrowserHost
 			this.running = false;
 		}
 
+		/// <summary>
+		/// Saves the host locally as soon as the browser has been created
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Browser_Created(object? sender, EventArgs e) {
 			var browser = sender as CefGlueBrowser;
 			host = browser!.CefBrowser.GetHost();

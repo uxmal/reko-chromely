@@ -14,6 +14,10 @@ namespace Reko.Chromely.BrowserHost
 		public RekoBrowserApp(IChromelyConfiguration config) : base(config) {
 		}
 
+		/// <summary>
+		/// Override that provides our custom <see cref="RekoRenderProcessHandler" />
+		/// </summary>
+		/// <returns></returns>
 		protected override CefRenderProcessHandler GetRenderProcessHandler() {
 			return renderProcessHandler;
 		}
