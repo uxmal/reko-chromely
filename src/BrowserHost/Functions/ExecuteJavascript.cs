@@ -17,8 +17,16 @@ namespace Reko.Chromely.BrowserHost.Functions
 	public class ExecuteJavascriptTask : CefTask
 	{
         private readonly CefV8Context ctx;
+
+        private readonly CefV8Value onScanComplete;
+
         public ExecuteJavascriptTask(CefV8Context context) {
             ctx = context;
+
+            ctx.Enter();
+            var glbl = ctx.GetGlobal();
+            onScanComplete = glbl.GetValue("OnScanComplete");
+            ctx.Exit();
 		}
 
         /// <summary>
@@ -28,11 +36,9 @@ namespace Reko.Chromely.BrowserHost.Functions
         /// <param name="dasm"></param>
         private void SendToClient(string dasm) {
             ctx.Enter();
-            var glbl = ctx.GetGlobal();
 
             // invoke JS function
             var argString = CefV8Value.CreateString(dasm);
-            var onScanComplete = glbl.GetValue("OnScanComplete");
             onScanComplete.ExecuteFunction(null, new CefV8Value[] { argString });
 
             ctx.Exit();
