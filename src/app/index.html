@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="Content/js/jquery.min.js"></script>
+    <style>
+        #klikme {
+            border: solid 1px black
+        }
+
+        #klikme:hover {
+            background-color: #FFEEEE
+        }
+    </style>
+</head>
+<body>
+    <input id="loadfile" type="file" button="Load image" />
+    Hello world.
+    <div id="klikme">Klikme</div>
+    <br />
+    <div id="dasmWin" >
+
+    </div>
+    <script type="text/javascript">
+        $(document).ready(() => {
+            $("#klikme").bind("click", e => {
+                executeRun();
+            });
+        });
+
+        function OnScanComplete(e) {
+            $("#dasmWin").html(e);
+        }
+
+        function executeRun() {
+            //var content = document.getElementById("demoscript").value;
+            var postData = { "framename": "alldemoframe", "script": "@@@content" };
+            var request = {
+                "method": "POST",
+                "url": "/executejavascript/execute",
+                "parameters": null,
+                "postData": JSON.stringify(postData),
+            };
+
+            window.cefQuery({
+                request: JSON.stringify(request),
+                onSuccess: function (response) {
+                    response = JSON.parse(response);
+                }, onFailure: function (err, msg) {
+                    console.log(err, msg);
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
