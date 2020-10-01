@@ -30,56 +30,28 @@ namespace Reko.Chromely.BrowserHost
 {
     public class AsyncHandlerProxy : CefV8Handler
     {
-        private readonly Func<CefV8Value[], CefV8Value> func;
+        private readonly Action<PromiseTask> func;
+        private readonly CefPromiseFactory promiseFactory;
 
-        public AsyncHandlerProxy(Func<CefV8Value[], CefV8Value> func)
+        public AsyncHandlerProxy(Action<PromiseTask> func, CefPromiseFactory promiseFactory)
         {
             this.func = func;
+            this.promiseFactory = promiseFactory;
         }
 
         /// <summary>
         /// Execute the delegated code asynchronously.
         /// </summary>
-        // Expects a callback in arg 0. //$TODO: change all this to a promise later.
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
         {
-            /**
-             * Create an asynchronous task on the render thread.
-             * The task is given the current execution context
-             * so that the task can call-back into JS code when it wants to
-             **/
-            var task = new AsyncTask(CefV8Context.GetCurrentContext(), func, arguments, arguments[0]);
-            CefTaskRunner.GetForCurrentThread().PostTask(task);
+            // create the promise body
+            var promiseBody = CefV8Value.CreateFunction("(anonymous)", new PromiseHandler(func));
 
-            //$TODO: Create a JS Promise and return it.
-            returnValue = CefV8Value.CreateNull();
+            // create the promise object
+            returnValue = promiseFactory.CreatePromise(promiseBody);
+
             exception = null!;
             return true;
-        }
-
-        private class AsyncTask : CefTask
-        {
-            private readonly CefV8Value callback;
-            private readonly CefV8Context ctx;
-            private readonly CefV8Value[] arguments;
-            private readonly Func<CefV8Value[], CefV8Value> func;
-
-            public AsyncTask(CefV8Context ctx, Func<CefV8Value[], CefV8Value> func, CefV8Value[] arguments, CefV8Value callback)
-            {
-                this.ctx = ctx;
-                this.func = func;
-                this.arguments = arguments;
-                this.callback = callback;
-            }
-
-            protected override void Execute()
-            {
-                var result = func(arguments);
-                //$TODO: resolve the promise
-                ctx.Acquire(() => {
-                    callback.ExecuteFunction(null, new CefV8Value[] { result });
-                });
-            }
         }
     }
 }

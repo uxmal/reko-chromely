@@ -21,40 +21,43 @@
 // THE SOFTWARE.
 #endregion
 
-using Reko.Arch.X86;
-using Reko.Chromely.Renderers;
-using Reko.Core;
-using Reko.Core.Machine;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.IO;
-using System.Text;
 using Xilium.CefGlue;
 
-namespace Reko.Chromely.BrowserHost.Functions
+namespace Reko.Chromely.BrowserHost
 {
-	public class Proto_DisassembleRandomBytes
-	{
-        public static void Execute(PromiseTask promise)
+    public class PromiseHandler : CefV8Handler
+    {
+        private readonly Action<PromiseTask> promiseBody;
+
+        public PromiseHandler(Action<PromiseTask> promiseBody)
         {
-            var rnd = new Random();
-            var buf = new byte[100];
-            rnd.NextBytes(buf);
-            var mem = new MemoryArea(Address.Ptr32(0x00123400), buf);
-            var arch = new X86ArchitectureFlat32(new ServiceContainer(), "x86-protected-32");
-            var rdr = arch.Endianness.CreateImageReader(mem, mem.BaseAddress);
-            var dasm = arch.CreateDisassembler(rdr);
-            var sw = new StringWriter();
-            var renderer = new HtmlMachineInstructionRenderer(sw);
-            var options = new MachineInstructionRendererOptions();
-            foreach (var instr in dasm)
-            {
-                instr.Render(renderer, options);
-            }
-            var sDasm = sw.ToString();
-            
-            promise.Resolve(CefV8Value.CreateString(sDasm));
+            this.promiseBody = promiseBody;
+        }
+
+        /// <summary>
+        /// Promise invocation
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="obj"></param>
+        /// <param name="arguments"></param>
+        /// <param name="returnValue"></param>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
+        {
+            var resolveCb = arguments[0];
+            var rejectCb = arguments[1];
+
+
+            var ctx = CefV8Context.GetCurrentContext();
+
+            var promiseTask = new PromiseTask(ctx, promiseBody, resolveCb, rejectCb);
+            CefTaskRunner.GetForCurrentThread().PostTask(promiseTask);
+
+            returnValue = CefV8Value.CreateUndefined();
+            exception = null!;
+            return true;
         }
     }
 }

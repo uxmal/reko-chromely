@@ -20,7 +20,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Reko.Decompiler.Runtime" Version="0.9.2-prerelease3" />
+    <PackageReference Include="Reko.Decompiler.Runtime" Version="0.9.2-prerelease2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,9 +1,8 @@
 ﻿((window, $) => {
     $(document).ready(() => {
-        $("#cmdDasm").bind("click", e => {
-            // Ideally, Proto_DisassembleRandomBytes will return 
-            // a Promise we can await.
-            window.reko.Proto_DisassembleRandomBytes(sHtml => $("#dasmWin").html(sHtml));
+        $("#cmdDasm").bind("click", async e => {
+            var sHtml = await window.reko.Proto_DisassembleRandomBytes();
+            $("#dasmWin").html(sHtml);
         });
         $("#cmdOpenFile").click(e => {
             $("#openFile").trigger("click");

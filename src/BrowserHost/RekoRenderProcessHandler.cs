@@ -17,7 +17,7 @@ namespace Reko.Chromely.BrowserHost
 		/// <param name="frame"></param>
 		/// <param name="context"></param>
 		protected override void OnContextCreated(CefBrowser browser, CefFrame frame, CefV8Context context) {
-			new RekoBrowserGlobals().RegisterGlobals(context);
+			new RekoBrowserGlobals(context).RegisterGlobals();
 		}
-	}
+    }
 }
