@@ -35,13 +35,11 @@ namespace Reko.Chromely.BrowserHost.Functions
         /// </summary>
         /// <param name="dasm"></param>
         private void SendToClient(string dasm) {
-            ctx.Enter();
-
-            // invoke JS function
-            var argString = CefV8Value.CreateString(dasm);
-            onScanComplete.ExecuteFunction(null, new CefV8Value[] { argString });
-
-            ctx.Exit();
+            ctx.Acquire(() => {
+                // invoke JS function
+                var argString = CefV8Value.CreateString(dasm);
+                onScanComplete.ExecuteFunction(null, new CefV8Value[] { argString });
+            });
         }
 
         protected override void Execute() {

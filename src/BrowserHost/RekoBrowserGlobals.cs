@@ -26,12 +26,10 @@ namespace Reko.Chromely.BrowserHost
 		/// </summary>
 		/// <param name="context"></param>
 		public void RegisterGlobals(CefV8Context context) {
-			context.Enter();
-
-			var glbl = context.GetGlobal();
-			RegisterFunction<ExecuteJavascript>("ExecuteJavascript", glbl);
-
-			context.Exit();
+			context.Acquire(() => {
+				var glbl = context.GetGlobal();
+				RegisterFunction<ExecuteJavascript>("ExecuteJavascript", glbl);
+			});
 		}
 	}
 }
