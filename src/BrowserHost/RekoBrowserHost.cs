@@ -38,16 +38,26 @@ namespace Reko.Chromely.BrowserHost
 			return new CefBrowserSettings();
 		}
 
-		private void InitializeRuntime(string[] args) {
+		/// <summary>
+		/// Initialize the CEF runtime and start the process
+		/// </summary>
+		/// <param name="args"></param>
+		/// <returns>whether we should continue with the initialization or not</returns>
+		private bool InitializeRuntime(string[] args) {
 			CefRuntime.Load();
 			var mainArgs = new CefMainArgs(args);
-			// spawn browser process. -1 indicates a browser process has been created
+			// fork. -1 indicates a browser process has been created
 			if(CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero) != -1) {
-				throw new Exception("Failed to create browser process");
+				/**
+				 * if we get here, we're a child process (e.g render process)
+				 * we don't need to re-do all the work, so we stop
+				 **/
+				return false;
 			}
 
 			var settings = CreateSettings();
 			CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
+			return true;
 		}
 
 		/// <summary>
@@ -93,7 +103,10 @@ namespace Reko.Chromely.BrowserHost
 		/// Create the browser and start the blocking message loop
 		/// </summary>
 		public void Run(string[] args) {
-			InitializeRuntime(args);
+			if (!InitializeRuntime(args)) {
+				// we're not the browser process
+				return;
+			}
 
 			this.browser = CreateBrowserObject();
 			browser.StartUrl = initialUrl;
