@@ -32,7 +32,7 @@ namespace Reko.Chromely
         static void Main(string[] args)
         {
             var host = new RekoBrowserHost();
-            host.Start();
+            host.Run(args);
         }
     }
 
