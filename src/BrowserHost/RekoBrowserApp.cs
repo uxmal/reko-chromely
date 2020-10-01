@@ -42,7 +42,6 @@ namespace Reko.Chromely.BrowserHost
 		/// <summary>
 		/// Override that provides our custom <see cref="RekoRenderProcessHandler" />
 		/// </summary>
-		/// <returns></returns>
 		protected override CefRenderProcessHandler GetRenderProcessHandler() {
 			return renderProcessHandler;
 		}

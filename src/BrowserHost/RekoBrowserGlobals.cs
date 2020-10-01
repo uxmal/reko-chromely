@@ -25,6 +25,7 @@ using Reko.Chromely.BrowserHost.Functions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using Xilium.CefGlue;
 
@@ -32,17 +33,16 @@ namespace Reko.Chromely.BrowserHost
 {
     /// <summary>
     /// This class is responsible for injecting the 'reko' global object into the global JS context of the caller.
-    /// The 'rek
     /// </summary>
 	public class RekoBrowserGlobals
 	{
         /// <summary>
         /// Add a synchronous method to the supplied JavaScript object.
         /// </summary>
-        /// <param name="functionName"></param>
         /// <param name="jsObject"></param>
+        /// <param name="functionName"></param>
         /// <param name="func"></param>
-        private void RegisterFunction(string functionName, CefV8Value jsObject, Func<CefV8Value[],CefV8Value> func)
+        private void RegisterFunction(CefV8Value jsObject, string functionName, Func<CefV8Value[], CefV8Value> func)
         {
             var handler = CefV8Value.CreateFunction(functionName, new HandlerProxy(func));
             jsObject.SetValue(functionName, handler);
@@ -51,15 +51,14 @@ namespace Reko.Chromely.BrowserHost
         /// <summary>
         /// Add an asynchronous method to the supplied JavaScript object
         /// </summary>
-        /// <param name="functionName"></param>
         /// <param name="jsObject"></param>
+        /// <param name="functionName"></param>
         /// <param name="func"></param>
-        private void RegisterAsyncFunction(string functionName, CefV8Value jsObject, Func<CefV8Value[], CefV8Value> func)
+        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Func<CefV8Value[], CefV8Value> func)
         {
             var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(func));
             jsObject.SetValue(functionName, handler);
         }
-
 
         /// <summary>
         /// Register custom variables and functions
@@ -69,11 +68,11 @@ namespace Reko.Chromely.BrowserHost
         public void RegisterGlobals(CefV8Context context)
         {
 			context.Acquire(() => {
-				var glbl = context.GetGlobal();
+				var global = context.GetGlobal();
 				var rekoObj = CefV8Value.CreateObject();
-				glbl.SetValue("reko", rekoObj);
+				global.SetValue("reko", rekoObj);
 				//RegisterFunction<Proto_DisassembleRandomBytes>("Proto_DisassembleRandomBytes", rekoObj);
-				RegisterAsyncFunction("Proto_DisassembleRandomBytes", rekoObj, Proto_DisassembleRandomBytes.Execute);
+				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", Proto_DisassembleRandomBytes.Execute);
 			});
 		}
 	}

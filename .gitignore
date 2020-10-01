@@ -2,3 +2,7 @@
 /src/bin/
 /src/obj/
 /src/*.user
+/src/app/Content/js/reko.min.js
+/src/app/Content/ts/**/*.js
+/src/app/Content/ts/**/*.map
+/src/app/Content/css/**/*.min.css

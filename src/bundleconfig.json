@@ -1,0 +1,20 @@
+[
+  {
+    "outputFileName": "app/Content/css/reko.min.css",
+    "inputFiles": [
+      "app/Content/css/reko.css",
+      "app/Content/css/index.css"
+    ]
+  },
+  {
+    "outputFileName": "app/Content/js/reko.min.js",
+    "inputFiles": [
+      "app/Content/ts/diagnostics.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  }
+]

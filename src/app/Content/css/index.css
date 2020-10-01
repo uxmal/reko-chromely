@@ -1,0 +1,14 @@
+﻿
+.klikme {
+    border: solid 1px black;
+    display: inline-block;
+    cursor: pointer
+}
+
+    .klikme:hover {
+        background-color: #802D2D
+    }
+
+#openFile {
+    display: none
+}

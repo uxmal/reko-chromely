@@ -1,44 +1,16 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="Content/css/reko.css" />
+    <link rel="stylesheet" href="Content/css/reko.min.css" />
     <script src="Content/js/jquery.min.js"></script>
-    <style>
-        #klikme {
-            border: solid 1px black;
-            display: inline-block;
-            cursor: pointer
-        }
-
-        #klikme:hover {
-            background-color: #802D2D
-        }
-    </style>
+    <script src="Content/js/index.js"></script>
 </head>
 <body>
-    <input id="loadfile" type="file" button="Load image" />
-    <div id="klikme">Disassemble some random X86 code</div>
+    <div id="cmdOpenFile" class="klikme">Load image</div><input id="openFile" type="file" button="Load image" />
+    <div id="cmdDasm" class="klikme">Disassemble some random X86 code</div>
     <br />
     <div id="dasmWin" class="reko-dasm">
 
     </div>
-    <script type="text/javascript">
-        $(document).ready(() => {
-            $("#klikme").bind("click", e => {
-                executeRun();
-            });
-        });
-
-        function OnScanComplete(e) {
-            $("#dasmWin").html(e);
-        }
-
-        function executeRun() {
-            // Ideally, Proto_DisassembleRandomBytes will return 
-            // a Promise we can await.
-            window.reko.Proto_DisassembleRandomBytes(OnScanComplete);
-        }
-    </script>
-
 </body>
 </html>
