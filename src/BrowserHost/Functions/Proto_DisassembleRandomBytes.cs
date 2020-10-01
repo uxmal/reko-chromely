@@ -56,6 +56,4 @@ namespace Reko.Chromely.BrowserHost.Functions
             return CefV8Value.CreateString(sDasm);
         }
     }
-
-
 }

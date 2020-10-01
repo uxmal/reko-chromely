@@ -37,6 +37,9 @@ namespace Reko.Chromely.BrowserHost
             this.func = func;
         }
 
+        /// <summary>
+        /// Execute the delegated code synchronously.
+        /// </summary>
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
         {
             try

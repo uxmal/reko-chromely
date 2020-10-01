@@ -37,18 +37,21 @@ namespace Reko.Chromely.BrowserHost
             this.func = func;
         }
 
+        /// <summary>
+        /// Execute the delegated code asynchronously.
+        /// </summary>
         // Expects a callback in arg 0. //$TODO: change all this to a promise later.
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
         {
             /**
              * Create an asynchronous task on the render thread.
-             * the task is given the current execution context
+             * The task is given the current execution context
              * so that the task can call-back into JS code when it wants to
              **/
             var task = new AsyncTask(CefV8Context.GetCurrentContext(), func, arguments, arguments[0]);
             CefTaskRunner.GetForCurrentThread().PostTask(task);
 
-            //$TODO: return a promise.
+            //$TODO: Create a JS Promise and return it.
             returnValue = CefV8Value.CreateNull();
             exception = null!;
             return true;
