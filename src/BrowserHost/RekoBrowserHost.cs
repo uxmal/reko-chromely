@@ -43,14 +43,14 @@ namespace Reko.Chromely.BrowserHost
 		/// </summary>
 		/// <param name="args"></param>
 		/// <returns>whether we should continue with the initialization or not</returns>
-		private bool InitializeRuntime(string[] args) {
+		private bool InitRuntimeAndFork(string[] args) {
 			CefRuntime.Load();
 			var mainArgs = new CefMainArgs(args);
 			// fork. -1 indicates a browser process has been created
 			if(CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero) != -1) {
 				/**
 				 * if we get here, we're a child process (e.g render process)
-				 * we don't need to re-do all the work, so we stop
+				 * signal this to the caller
 				 **/
 				return false;
 			}
@@ -103,8 +103,12 @@ namespace Reko.Chromely.BrowserHost
 		/// Create the browser and start the blocking message loop
 		/// </summary>
 		public void Run(string[] args) {
-			if (!InitializeRuntime(args)) {
-				// we're not the browser process
+			if (!InitRuntimeAndFork(args)) {
+				/**
+				 * if we get here, we're not running on the browser process.
+				 * since the initialization code must be ran only on the main browser process
+				 * we bail out
+				 **/
 				return;
 			}
 
