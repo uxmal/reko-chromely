@@ -34,7 +34,9 @@
         }
 
         function executeRun() {
-            window.ExecuteJavascript();
+            // Ideally, Proto_DisassembleRandomBytes will return 
+            // a Promise we can await.
+            window.reko.Proto_DisassembleRandomBytes(OnScanComplete);
         }
     </script>
 

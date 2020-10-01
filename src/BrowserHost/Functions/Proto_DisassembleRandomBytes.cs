@@ -21,30 +21,41 @@
 // THE SOFTWARE.
 #endregion
 
-using Chromely.CefGlue.Browser;
-using Chromely.Core.Configuration;
+using Reko.Arch.X86;
+using Reko.Chromely.Renderers;
+using Reko.Core;
+using Reko.Core.Machine;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.IO;
 using System.Text;
 using Xilium.CefGlue;
 
-namespace Reko.Chromely.BrowserHost
+namespace Reko.Chromely.BrowserHost.Functions
 {
-	public class RekoBrowserApp : CefGlueApp
+	public class Proto_DisassembleRandomBytes 
 	{
-		private readonly RekoRenderProcessHandler renderProcessHandler = new RekoRenderProcessHandler();
-
-		public RekoBrowserApp(IChromelyConfiguration config) 
-            : base(config)
+        public static CefV8Value Execute(CefV8Value[] parameters)
         {
-		}
+            var rnd = new Random();
+            var buf = new byte[100];
+            rnd.NextBytes(buf);
+            var mem = new MemoryArea(Address.Ptr32(0x00123400), buf);
+            var arch = new X86ArchitectureFlat32(new ServiceContainer(), "x86-protected-32");
+            var rdr = arch.Endianness.CreateImageReader(mem, mem.BaseAddress);
+            var dasm = arch.CreateDisassembler(rdr);
+            var sw = new StringWriter();
+            var renderer = new HtmlMachineInstructionRenderer(sw);
+            var options = new MachineInstructionRendererOptions();
+            foreach (var instr in dasm)
+            {
+                instr.Render(renderer, options);
+            }
+            var sDasm = sw.ToString();
+            return CefV8Value.CreateString(sDasm);
+        }
+    }
 
-		/// <summary>
-		/// Override that provides our custom <see cref="RekoRenderProcessHandler" />
-		/// </summary>
-		/// <returns></returns>
-		protected override CefRenderProcessHandler GetRenderProcessHandler() {
-			return renderProcessHandler;
-		}
-	}
+
 }

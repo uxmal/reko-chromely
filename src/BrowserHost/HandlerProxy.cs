@@ -21,8 +21,6 @@
 // THE SOFTWARE.
 #endregion
 
-using Chromely.CefGlue.Browser;
-using Chromely.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,21 +28,28 @@ using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
-	public class RekoBrowserApp : CefGlueApp
-	{
-		private readonly RekoRenderProcessHandler renderProcessHandler = new RekoRenderProcessHandler();
+    public class HandlerProxy : CefV8Handler
+    {
+        private readonly Func<CefV8Value[], CefV8Value> func;
 
-		public RekoBrowserApp(IChromelyConfiguration config) 
-            : base(config)
+        public HandlerProxy(Func<CefV8Value[], CefV8Value> func)
         {
-		}
+            this.func = func;
+        }
 
-		/// <summary>
-		/// Override that provides our custom <see cref="RekoRenderProcessHandler" />
-		/// </summary>
-		/// <returns></returns>
-		protected override CefRenderProcessHandler GetRenderProcessHandler() {
-			return renderProcessHandler;
-		}
-	}
+        protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
+        {
+            try
+            {
+                returnValue = func(arguments);
+                exception = null!;
+            }
+            catch (Exception ex)
+            {
+                returnValue = CefV8Value.CreateNull();
+                exception = ex.Message;
+            }
+            return true;
+        }
+    }
 }
