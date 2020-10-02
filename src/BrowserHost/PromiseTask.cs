@@ -10,17 +10,20 @@ namespace Reko.Chromely.BrowserHost
         private readonly CefV8Context ctx;
 
         private readonly Action<PromiseTask> func;
+        public readonly CefV8Value[] Arguments;
         private readonly CefV8Value resolveCb;
         private readonly CefV8Value rejectCb;
 
         public PromiseTask(
             CefV8Context ctx,
             Action<PromiseTask> func,
+            CefV8Value[] arguments,
             CefV8Value resolveCb, CefV8Value rejectCb
         )
         {
             this.ctx = ctx;
             this.func = func;
+            this.Arguments = arguments;
             this.resolveCb = resolveCb;
             this.rejectCb = rejectCb;
         }

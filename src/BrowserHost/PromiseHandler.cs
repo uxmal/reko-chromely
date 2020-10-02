@@ -29,10 +29,12 @@ namespace Reko.Chromely.BrowserHost
     public class PromiseHandler : CefV8Handler
     {
         private readonly Action<PromiseTask> promiseBody;
+        private readonly CefV8Value[] callerArguments;
 
-        public PromiseHandler(Action<PromiseTask> promiseBody)
+        public PromiseHandler(Action<PromiseTask> promiseBody, CefV8Value[] arguments)
         {
             this.promiseBody = promiseBody;
+            this.callerArguments = arguments;
         }
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace Reko.Chromely.BrowserHost
 
             var ctx = CefV8Context.GetCurrentContext();
 
-            var promiseTask = new PromiseTask(ctx, promiseBody, resolveCb, rejectCb);
+            var promiseTask = new PromiseTask(ctx, promiseBody, callerArguments, resolveCb, rejectCb);
             CefTaskRunner.GetForCurrentThread().PostTask(promiseTask);
 
             returnValue = CefV8Value.CreateUndefined();

@@ -45,7 +45,7 @@ namespace Reko.Chromely.BrowserHost
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
         {
             // create the promise body
-            var promiseBody = CefV8Value.CreateFunction("(anonymous)", new PromiseHandler(func));
+            var promiseBody = CefV8Value.CreateFunction("(anonymous)", new PromiseHandler(func, arguments));
 
             // create the promise object
             returnValue = promiseFactory.CreatePromise(promiseBody);
