@@ -39,7 +39,7 @@ namespace Reko.Chromely.BrowserHost.Functions
 	{
         public static void Execute(PromiseTask promise)
         {
-            Thread.Sleep(6000); // Simulate a slow running thread.
+            Thread.Sleep(5000); // Simulate a slow running thread.
             var rnd = new Random();
             var buf = new byte[100];
             rnd.NextBytes(buf);
@@ -56,7 +56,9 @@ namespace Reko.Chromely.BrowserHost.Functions
             }
             var sDasm = sw.ToString();
             
-            promise.Resolve(CefV8Value.CreateString(sDasm));
+// I've been runing for a whilem it's time to deliver the goods. Because I'm not in a js context, 
+// I can't use CefV8Value. I pass my C# value to the Resolve method.
+            promise.Resolve(sDasm);
         }
     }
 }

@@ -22,6 +22,8 @@
 #endregion
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
@@ -52,10 +54,12 @@ namespace Reko.Chromely.BrowserHost
             var rejectCb = arguments[1];
 
             var ctx = CefV8Context.GetCurrentContext();
-
-            var promiseTask = new PromiseTask(ctx, promiseBody, callerArguments, resolveCb, rejectCb);
-            CefTaskRunner.GetForCurrentThread().PostTask(promiseTask);
-            //CefTaskRunner.GetForThread(CefThreadId.FileUserBlocking).PostTask(promiseTask);
+            var promiseTask = new PromiseTask(ctx, callerArguments, resolveCb, rejectCb);
+            Task.Run(() =>
+            {
+                // Start running C# code in its own thread, No JS calls are allowed at this point.
+                promiseBody(promiseTask);
+            });
 
             returnValue = CefV8Value.CreateUndefined();
             exception = null!;
