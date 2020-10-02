@@ -33,17 +33,39 @@ using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
-
     /// <summary>
     /// This class is responsible for injecting the 'reko' global object into the global JS context of the caller.
     /// </summary>
 	public class RekoBrowserGlobals
 	{
         private readonly CefV8Context context;
+        private readonly CefPromiseFactory promiseFactory;
 
         public RekoBrowserGlobals(CefV8Context context)
         {
             this.context = context;
+            CefPromiseFactory promiseFactory = CreatePromiseFactory();
+            this.promiseFactory = promiseFactory;
+        }
+
+        /// <summary>
+        /// Creates a "createPromise" function on the JS side.
+        /// </summary>
+        private CefPromiseFactory CreatePromiseFactory()
+        {
+            context.Enter();
+            context.GetFrame().ExecuteJavaScript(@"
+                window.createPromise = function (fn) {
+                    return new Promise(fn);
+                };
+                ", null, 1);
+
+            var global = context.GetGlobal();
+            var promiseFactoryFn = global.GetValue("createPromise");
+
+            var promiseFactory = new CefPromiseFactory(promiseFactoryFn);
+            context.Exit();
+            return promiseFactory;
         }
 
         /// <summary>
@@ -64,35 +86,26 @@ namespace Reko.Chromely.BrowserHost
         /// <param name="jsObject"></param>
         /// <param name="functionName"></param>
         /// <param name="func"></param>
-        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, CefPromiseFactory promiseFactory, Action<PromiseTask> func)
+        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Action<PromiseTask> func)
         {
-            var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(func, promiseFactory));
+            var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(func, this.promiseFactory));
             jsObject.SetValue(functionName, handler);
         }
 
         /// <summary>
-        /// Register custom variables and functions
-        /// in the global context
+        /// Register custom variables and functions in the global context
         /// </summary>
-        /// <param name="context"></param>
         public void RegisterGlobals()
         {
 			context.Acquire(() => {
-                context.GetFrame().ExecuteJavaScript(@"
-                window.createPromise = function (fn) {
-                    return new Promise(fn);
-                };
-                ", null, 1);
 
-				var global = context.GetGlobal();
-				var rekoObj = CefV8Value.CreateObject();
+                var global = context.GetGlobal();
+                var rekoObj = CefV8Value.CreateObject();
 
-                var promiseFactoryFn = global.GetValue("createPromise");
-                var promiseFactory = new CefPromiseFactory(promiseFactoryFn);
 
-				global.SetValue("reko", rekoObj);
+                global.SetValue("reko", rekoObj);
 				//RegisterFunction<Proto_DisassembleRandomBytes>("Proto_DisassembleRandomBytes", rekoObj);
-				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", promiseFactory, Proto_DisassembleRandomBytes.Execute);
+				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", Proto_DisassembleRandomBytes.Execute);
 			});
 		}
 	}

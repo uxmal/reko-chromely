@@ -38,7 +38,7 @@ namespace Reko.Chromely.BrowserHost
         }
 
         /// <summary>
-        /// Promise invocation
+        /// Start executing the promise.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="obj"></param>
@@ -51,11 +51,11 @@ namespace Reko.Chromely.BrowserHost
             var resolveCb = arguments[0];
             var rejectCb = arguments[1];
 
-
             var ctx = CefV8Context.GetCurrentContext();
 
             var promiseTask = new PromiseTask(ctx, promiseBody, callerArguments, resolveCb, rejectCb);
             CefTaskRunner.GetForCurrentThread().PostTask(promiseTask);
+            //CefTaskRunner.GetForThread(CefThreadId.FileUserBlocking).PostTask(promiseTask);
 
             returnValue = CefV8Value.CreateUndefined();
             exception = null!;

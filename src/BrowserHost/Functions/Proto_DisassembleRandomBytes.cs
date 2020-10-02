@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Text;
+using System.Threading;
 using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost.Functions
@@ -38,6 +39,7 @@ namespace Reko.Chromely.BrowserHost.Functions
 	{
         public static void Execute(PromiseTask promise)
         {
+            Thread.Sleep(6000); // Simulate a slow running thread.
             var rnd = new Random();
             var buf = new byte[100];
             rnd.NextBytes(buf);
