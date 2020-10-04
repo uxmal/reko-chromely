@@ -29,10 +29,10 @@ namespace Reko.Chromely
 	class Program
     {
         [STAThread]
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             var host = new RekoBrowserHost();
-            host.Run(args);
+            return host.Run(args);
         }
     }
 

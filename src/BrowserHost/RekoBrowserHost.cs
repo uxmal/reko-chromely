@@ -27,7 +27,7 @@ namespace Reko.Chromely.BrowserHost
 		private static CefSettings CreateSettings() {
 			return new CefSettings() {
 				MultiThreadedMessageLoop = false,
-				NoSandbox = true,
+				NoSandbox = true
 			};
         }
 
@@ -38,30 +38,6 @@ namespace Reko.Chromely.BrowserHost
 		
 		private static CefBrowserSettings CreateBrowserSettings() {
 			return new CefBrowserSettings();
-		}
-
-		/// <summary>
-		/// Initialize the CEF runtime and start the process
-		/// </summary>
-		/// <param name="args"></param>
-		/// <returns>whether we should continue with the initialization or not</returns>
-		private bool InitRuntimeAndFork(string[] args) {
-			CefRuntime.Load();
-            var mainArgs = new CefMainArgs(args);
-			// fork. -1 indicates a browser process has been created
-			if (CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero) != -1)
-            {
-				/**
-				 * if we get here, we're a child process (e.g render process)
-				 * signal this to the caller
-				 **/
-				return false;
-			}
-
-			var settings = CreateSettings();
-			CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
-            CefRuntime.RegisterSchemeHandlerFactory("reko", "", new RekoSchemeHandlerFactory());
-            return true;
 		}
 
 		/// <summary>
@@ -106,17 +82,26 @@ namespace Reko.Chromely.BrowserHost
 		/// <summary>
 		/// Create the browser and start the blocking message loop
 		/// </summary>
-		public void Run(string[] args) {
-			if (!InitRuntimeAndFork(args)) {
+		public int Run(string[] args) {
+            CefRuntime.Load();
+            var mainArgs = new CefMainArgs(args);
+            
+            // fork. -1 indicates a browser process has been created
+            int exitCode = CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero);
+            if (exitCode != -1) {
 				/**
 				 * if we get here, we're not running on the browser process.
 				 * since the initialization code must be ran only on the main browser process
 				 * we bail out
 				 **/
-				return;
+				return exitCode;
 			}
 
-			this.browser = (RekoGlueBrowser)CreateBrowserObject();
+            var settings = CreateSettings();
+            CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
+            CefRuntime.RegisterSchemeHandlerFactory("reko", "", new RekoSchemeHandlerFactory());
+
+            this.browser = (RekoGlueBrowser)CreateBrowserObject();
 			browser.StartUrl = initialUrl;
 
 			browser.Created += Browser_Created;
@@ -132,6 +117,7 @@ namespace Reko.Chromely.BrowserHost
 
 			host!.CloseBrowser(false);
 			CefRuntime.Shutdown();
+            return 0;
 		}
 
 		private void Browser_BeforeClose(object? sender, global::Chromely.CefGlue.Browser.EventParams.BeforeCloseEventArgs e) {
