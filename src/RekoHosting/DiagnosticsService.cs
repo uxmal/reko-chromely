@@ -27,23 +27,27 @@ using Reko.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Xilium.CefGlue;
 
 namespace Reko.Chromely.RekoHosting
 {
+    // NOTE: this interface should not be needed. However, due to carelessness some parts of the 
+    // low-level reko code accidentally are using this service. A todo is to move everything over
+    // to DecompilerEventListener.
     public class DiagnosticsService : IDiagnosticsService
     {
         private readonly DecompilerEventListener listener;
-        private readonly IChromelyJavaScriptExecutor js;
+        private readonly CefV8Context ctx;
 
-        public DiagnosticsService(DecompilerEventListener listener, IChromelyJavaScriptExecutor js)
+        public DiagnosticsService(DecompilerEventListener listener, CefV8Context ctx)
         {
             this.listener = listener;
-            this.js = js;
+            this.ctx = ctx;
         }
 
         public void ClearDiagnostics()
         {
-            js.ExecuteScript("diagnostics.clear()");
+            //$ js.ExecuteScript("diagnostics.clear()");
         }
 
         public void Error(string message)
