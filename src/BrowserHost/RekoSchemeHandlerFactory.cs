@@ -14,8 +14,11 @@ namespace Reko.Chromely.BrowserHost
     {
         protected override CefResourceHandler Create(CefBrowser browser, CefFrame frame, string schemeName, CefRequest request)
         {
-            var query = request.Url;
-            var bytes = Proto_GeneratePng.Generate();
+            // Wha I want to do here is parametrize the query so we can do "show memory starting at address = xxxxx"
+            // Effit.
+            var q = new Uri(request.Url).Query;
+            var query = HttpUtility.ParseQueryString(q);
+            var bytes = Proto_GeneratePng.Generate(Convert.ToInt32(query["percent"]));
 
             return new RekoResourceHandler(bytes, "image/png");
         }
@@ -31,7 +34,6 @@ namespace Reko.Chromely.BrowserHost
                 this.blob = blob;
                 this.mimeType = mimeType;
                 this.offset = 0;
-                //DebuggerHelper.Launch();
             }
 
             protected override void Cancel()
