@@ -106,7 +106,6 @@ namespace Reko.Chromely.BrowserHost
                 var global = context.GetGlobal();
                 var rekoObj = CefV8Value.CreateObject();
 
-
                 global.SetValue("reko", rekoObj);
                 //RegisterFunction<Proto_DisassembleRandomBytes>("Proto_DisassembleRandomBytes", rekoObj);
                 RegisterAsyncFunction(rekoObj, "OpenFile", Proto_OpenFile.ExecuteAsync, new Proto_OpenFileHandlerFactory(pendingPromises));

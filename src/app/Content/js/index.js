@@ -16,10 +16,10 @@
             var filePath = await window.reko.OpenFile(e.target.value);
             alert(`Opened file ${filePath}`);
         });
-        $("#cmdGeneratePng").click(e => {
-            //$TODO: pass a parameter
-            let image = await window.reko.Proto_GeneratePng();
-            $("#imgGenerated").se
+        $("#cmdGeneratePng").click(async e => {
+            let data = await window.reko.Proto_GeneratePng();
+            let blob = new Blob([Uint8Array.from(data)], { type: "image/png" });
+            $("#imgGenerated").attr("src", URL.createObjectURL(blob));
         })
     });
 

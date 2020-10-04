@@ -21,6 +21,11 @@ namespace Reko.Chromely.BrowserHost
 			new RekoBrowserGlobals(pendingPromises, context).RegisterGlobals();
         }
 
+        protected override void OnContextReleased(CefBrowser browser, CefFrame frame, CefV8Context context)
+        {
+            base.OnContextReleased(browser, frame, context);
+        }
+
         protected override bool OnProcessMessageReceived(CefBrowser browser, CefFrame frame, CefProcessId sourceProcess, CefProcessMessage message)
         {
             if(message.Name == "openFileReply")

@@ -22,5 +22,20 @@ namespace Reko.Chromely.BrowserHost
                 ctx.Exit();
             }
         }
+
+        public static T Acquire<T>(this CefV8Context ctx, Func<T> body)
+        {
+            ctx.Enter();
+            T result;
+            try
+            {
+                result = body.Invoke();
+            }
+            finally
+            {
+                ctx.Exit();
+            }
+            return result;
+        }
 	}
 }

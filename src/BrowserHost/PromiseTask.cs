@@ -1,10 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
+    public class ArrayBufferHandler : CefV8ArrayBufferReleaseCallback
+    {
+        private GCHandle gch;
+
+        public ArrayBufferHandler(GCHandle gch)
+        {
+            this.gch = gch;
+        }
+
+        protected override void ReleaseBuffer(IntPtr buffer)
+        {
+            Console.WriteLine("FREEEEE THE THING");
+            gch.Free();
+        }
+    }
+
     public class PromiseTask : CefTask
     {
         private readonly CefV8Context ctx;
@@ -61,15 +78,39 @@ namespace Reko.Chromely.BrowserHost
         {
             // We just got called from the JS runtime task runner. We are in a JS context,
             // so it's safeto create JS values.
-            var result = ConvertToJsValue(this.result);
-            // Now we can call the resolve JS function with our converted value.
-            this.toRun.ExecuteFunctionWithContext(ctx, null, new CefV8Value[] { result });
+            ctx.Acquire(() =>
+            {
+                var result = ConvertToJsValue(this.result);
+                // Now we can call the resolve JS function with our converted value.
+                this.toRun.ExecuteFunction(null, new CefV8Value[] { result });
+            });
+        }
+
+        private static CefV8Value CreateArrayBuffer(byte[] arr)
+        {
+            var gch = GCHandle.Alloc(arr, GCHandleType.Pinned);
+            var dataptr = gch.AddrOfPinnedObject();
+
+            var cb = new ArrayBufferHandler(gch);
+            return CefV8Value.CreateArrayBuffer(dataptr, (ulong)arr.Length, cb);
+        }
+
+        private static CefV8Value CreateArray(byte[] arr)
+        {
+            var val = CefV8Value.CreateArray(arr.Length);
+
+            for(int i=0; i<arr.Length; i++)
+            {
+                val.SetValue(i, CefV8Value.CreateUInt(arr[i]));
+            }
+            return val;
         }
 
         private CefV8Value ConvertToJsValue(object result)
         {
             return result switch {
                 string s => CefV8Value.CreateString(s),
+                byte[] arr => CreateArray(arr),
                 _ => throw new NotImplementedException()
             };
         }
