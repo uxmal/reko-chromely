@@ -49,7 +49,6 @@ namespace Reko.Chromely.BrowserHost.Functions
 
         public static void ExecuteAsync(PromiseTask task)
         {
-            //empty
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Reko.Chromely.BrowserHost
 		private static CefSettings CreateSettings() {
 			return new CefSettings() {
 				MultiThreadedMessageLoop = false,
-				NoSandbox = true
+				NoSandbox = true,
 			};
         }
 
@@ -47,9 +47,10 @@ namespace Reko.Chromely.BrowserHost
 		/// <returns>whether we should continue with the initialization or not</returns>
 		private bool InitRuntimeAndFork(string[] args) {
 			CefRuntime.Load();
-			var mainArgs = new CefMainArgs(args);
+            var mainArgs = new CefMainArgs(args);
 			// fork. -1 indicates a browser process has been created
-			if(CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero) != -1) {
+			if (CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero) != -1)
+            {
 				/**
 				 * if we get here, we're a child process (e.g render process)
 				 * signal this to the caller
@@ -59,7 +60,8 @@ namespace Reko.Chromely.BrowserHost
 
 			var settings = CreateSettings();
 			CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
-			return true;
+            CefRuntime.RegisterSchemeHandlerFactory("reko", "", new RekoSchemeHandlerFactory());
+            return true;
 		}
 
 		/// <summary>
@@ -128,7 +130,7 @@ namespace Reko.Chromely.BrowserHost
 				CefRuntime.DoMessageLoopWork();
 			}
 
-			host!.CloseBrowser(true);
+			host!.CloseBrowser(false);
 			CefRuntime.Shutdown();
 		}
 

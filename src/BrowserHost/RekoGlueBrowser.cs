@@ -43,6 +43,5 @@ namespace Reko.Chromely.BrowserHost
             settings.WebSecurity = CefState.Disabled;
             CefBrowserHost.CreateBrowser(windowInfo, client, settings, StartUrl);
         }
-
     }
 }

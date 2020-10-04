@@ -2,7 +2,7 @@
     $(document).ready(() => {
         $("#cmdDasm").bind("click", async e => {
             $("#dasmWin").html("Simulating a slow load...");
-            var sHtml = await window.reko.Proto_DisassembleRandomBytes();
+            var sHtml = await window.reko.Proto_DisassembleRandomBytes("0010000", "00010");
             $("#dasmWin").html(sHtml);
         });
         $("#cmdOpenFile").click(e => {
@@ -18,9 +18,8 @@
         });
         $("#cmdGeneratePng").click(e => {
             //$TODO: pass a parameter
-            let image = await window.reko.Proto_GeneratePng();
-            $("#imgGenerated").se
-        })
+            //let image = await window.reko.Proto_GeneratePng();
+        });
     });
 
     diagnostics = {
