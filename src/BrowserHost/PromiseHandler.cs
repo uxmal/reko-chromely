@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Security.Authentication.ExtendedProtection;
 using System.Threading;
 using System.Threading.Tasks;
 using Xilium.CefGlue;
@@ -37,6 +38,10 @@ namespace Reko.Chromely.BrowserHost
         {
             this.promiseBody = promiseBody;
             this.callerArguments = arguments;
+        }
+
+        protected virtual void OnExecuteSync(PromiseTask promise)
+        {
         }
 
         /// <summary>
@@ -55,6 +60,9 @@ namespace Reko.Chromely.BrowserHost
 
             var ctx = CefV8Context.GetCurrentContext();
             var promiseTask = new PromiseTask(ctx, callerArguments, resolveCb, rejectCb);
+
+            OnExecuteSync(promiseTask);
+
             Task.Run(() =>
             {
                 // Start running C# code in its own thread, No JS calls are allowed at this point.

@@ -1,7 +1,9 @@
 ﻿using Caliburn.Light;
 using Chromely.CefGlue.Browser;
+using Chromely.Core;
 using Chromely.Core.Configuration;
 using Chromely.Core.Defaults;
+using Chromely.Core.Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +29,7 @@ namespace Reko.Chromely.BrowserHost
 				MultiThreadedMessageLoop = false,
 				NoSandbox = true
 			};
-		}
+        }
 
 		private static CefMessageRouterBrowserSide CreateRouter() {
 			var routerConfig = new CefMessageRouterConfig();
@@ -71,20 +73,20 @@ namespace Reko.Chromely.BrowserHost
 			return windowInfo;
 		}
 
-		private CefGlueBrowser CreateBrowserObject() {
-			var router = CreateRouter();
+        private CefGlueBrowser CreateBrowserObject() {
+			var router = CreateRouter();          
 
 			var container = new SimpleContainer();
 			var taskRunner = new DefaultCommandTaskRunner(container);
 
 			var browserSettings = CreateBrowserSettings();
-			return new CefGlueBrowser(this, container, config, taskRunner, router, browserSettings);
+			return new RekoGlueBrowser(this, container, config, taskRunner, router, browserSettings);
 		}
 
 		private readonly IChromelyConfiguration config;
 		private readonly RekoBrowserApp app;
 
-		private CefGlueBrowser? browser;
+		private RekoGlueBrowser? browser;
 		private CefBrowserHost? host;
 		private bool running = false;
 
@@ -112,7 +114,7 @@ namespace Reko.Chromely.BrowserHost
 				return;
 			}
 
-			this.browser = CreateBrowserObject();
+			this.browser = (RekoGlueBrowser)CreateBrowserObject();
 			browser.StartUrl = initialUrl;
 
 			browser.Created += Browser_Created;
@@ -142,6 +144,6 @@ namespace Reko.Chromely.BrowserHost
 		private void Browser_Created(object? sender, EventArgs e) {
 			var browser = sender as CefGlueBrowser;
 			host = browser!.CefBrowser.GetHost();
-		}
+        }
 	}
 }

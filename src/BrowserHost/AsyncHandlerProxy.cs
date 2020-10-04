@@ -28,15 +28,31 @@ using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
+    public class DefaultPromiseHandlerFactory : IPromiseHandlerFactory
+    {
+        public CefV8Handler CreateHandler(Action<PromiseTask> promiseBody, CefV8Value[] arguments)
+        {
+            return new PromiseHandler(promiseBody, arguments);
+        }
+    }
+
     public class AsyncHandlerProxy : CefV8Handler
     {
         private readonly Action<PromiseTask> func;
         private readonly CefPromiseFactory promiseFactory;
+        private readonly IPromiseHandlerFactory handlerFactory;
 
-        public AsyncHandlerProxy(Action<PromiseTask> func, CefPromiseFactory promiseFactory)
+        public AsyncHandlerProxy(Action<PromiseTask> func, CefPromiseFactory promiseFactory, IPromiseHandlerFactory handlerFactory = null)
         {
             this.func = func;
             this.promiseFactory = promiseFactory;
+            if (handlerFactory != null)
+            {
+                this.handlerFactory = handlerFactory;
+            } else
+            {
+                this.handlerFactory = new DefaultPromiseHandlerFactory();
+            }
         }
 
         /// <summary>
@@ -45,7 +61,7 @@ namespace Reko.Chromely.BrowserHost
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
         {
             // create the promise body
-            var promiseBody = CefV8Value.CreateFunction("(anonymous)", new PromiseHandler(func, arguments));
+            var promiseBody = CefV8Value.CreateFunction("(anonymous)", handlerFactory.CreateHandler(func, arguments));
 
             // create the promise object
             returnValue = promiseFactory.CreatePromise(promiseBody);

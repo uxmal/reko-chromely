@@ -40,9 +40,11 @@ namespace Reko.Chromely.BrowserHost
 	{
         private readonly CefV8Context context;
         private readonly CefPromiseFactory promiseFactory;
+        private readonly PendingPromisesRepository pendingPromises;
 
-        public RekoBrowserGlobals(CefV8Context context)
+        public RekoBrowserGlobals(PendingPromisesRepository pendingPromises, CefV8Context context)
         {
+            this.pendingPromises = pendingPromises;
             this.context = context;
             CefPromiseFactory promiseFactory = CreatePromiseFactory();
             this.promiseFactory = promiseFactory;
@@ -86,9 +88,11 @@ namespace Reko.Chromely.BrowserHost
         /// <param name="jsObject"></param>
         /// <param name="functionName"></param>
         /// <param name="func"></param>
-        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Action<PromiseTask> func)
+        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Action<PromiseTask> func, IPromiseHandlerFactory handlerFactory = null)
         {
-            var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(func, this.promiseFactory));
+            var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(
+                func, this.promiseFactory, handlerFactory
+            ));
             jsObject.SetValue(functionName, handler);
         }
 
@@ -104,7 +108,8 @@ namespace Reko.Chromely.BrowserHost
 
 
                 global.SetValue("reko", rekoObj);
-				//RegisterFunction<Proto_DisassembleRandomBytes>("Proto_DisassembleRandomBytes", rekoObj);
+                //RegisterFunction<Proto_DisassembleRandomBytes>("Proto_DisassembleRandomBytes", rekoObj);
+                RegisterAsyncFunction(rekoObj, "OpenFile", Proto_OpenFile.ExecuteAsync, new Proto_OpenFileHandlerFactory(pendingPromises));
 				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", Proto_DisassembleRandomBytes.Execute);
 			});
 		}

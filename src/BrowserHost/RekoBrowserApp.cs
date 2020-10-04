@@ -34,7 +34,7 @@ namespace Reko.Chromely.BrowserHost
 	{
 		private readonly RekoRenderProcessHandler renderProcessHandler = new RekoRenderProcessHandler();
 
-		public RekoBrowserApp(IChromelyConfiguration config) 
+        public RekoBrowserApp(IChromelyConfiguration config) 
             : base(config)
         {
 		}
@@ -45,5 +45,5 @@ namespace Reko.Chromely.BrowserHost
 		protected override CefRenderProcessHandler GetRenderProcessHandler() {
 			return renderProcessHandler;
 		}
-	}
+    }
 }

@@ -11,8 +11,10 @@
         $("#cmdClearDasm").click(e => {
             $("#dasmWin").html("Cleared!");
         })
-        $("#openFile").change(e => {
-            //$TODO: window.reko.OpenFile(e.target.value, e => alert("Opened file" + e));
+        $("#openFile").click(async e => {
+            e.preventDefault();
+            var filePath = await window.reko.OpenFile(e.target.value);
+            alert(`Opened file ${filePath}`);
         });
     });
 
