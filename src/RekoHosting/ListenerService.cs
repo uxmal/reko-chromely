@@ -23,25 +23,27 @@
 
 using Chromely.Core;
 using Chromely.Core.Configuration;
+using Reko.Chromely.BrowserHost;
 using Reko.Core;
 using Reko.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Xilium.CefGlue;
 
 namespace Reko.Chromely.RekoHosting
 {
+    //$TODO: this needs to call back to JavaScript to show diagnostics. We want to call back to JavaScript, somehow obtaining
+    // a reference to the current context. Or rather, get the runner and push a task on it. right?
     public class ListenerService : DecompilerEventListener
     {
-        private readonly IChromelyConfiguration config;
         private bool canceled;
+        private CefV8Context ctx;
 
-        public ListenerService(IChromelyConfiguration config)
+        public ListenerService(CefV8Context ctx)
         {
-            this.config = config;
+            this.ctx = ctx;
         }
-
-        private IChromelyJavaScriptExecutor JavaScript => config.JavaScriptExecutor;
 
         public void Cancel()
         {
@@ -52,9 +54,10 @@ namespace Reko.Chromely.RekoHosting
         {
             this.canceled = false;
         }
+
         public void Advance(int count)
         {
-            JavaScript.ExecuteScript($"diagnostics.advance({count})");
+            //JavaScript.ExecuteScript($"diagnostics.advance({count})");
         }
 
         public ICodeLocation CreateAddressNavigator(Core.Program program, Address address)
@@ -84,7 +87,7 @@ namespace Reko.Chromely.RekoHosting
 
         public void Error(ICodeLocation location, string message)
         {
-            JavaScript.ExecuteScript($"diagnostics.error({Quote(location.Text)},{Quote(message)})");
+            ctx.GetTaskRunner().PostTask(new DiagnosticTask(this.ctx, $"<div class='diag-err'><div>NYI</div><div>{message}</div></div>"));
         }
 
         public void Error(ICodeLocation location, string message, params object[] args)
@@ -104,7 +107,7 @@ namespace Reko.Chromely.RekoHosting
 
         public void Info(ICodeLocation location, string message)
         {
-            JavaScript.ExecuteScript($"diagnostics.info({Quote(location.Text)},{Quote(message)})");
+            ctx.GetTaskRunner().PostTask(new DiagnosticTask(this.ctx, $"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>"));
         }
 
         public void Info(ICodeLocation location, string message, params object[] args)
@@ -119,17 +122,17 @@ namespace Reko.Chromely.RekoHosting
 
         public void ShowProgress(string caption, int numerator, int denominator)
         {
-            JavaScript.ExecuteScript($"diagnostics.progress({Quote(caption)}, {numerator}, {denominator})");
+            //JavaScript.ExecuteScript($"diagnostics.progress({Quote(caption)}, {numerator}, {denominator})");
         }
 
         public void ShowStatus(string caption)
         {
-            JavaScript.ExecuteScript($"diagnostics.status({Quote(caption)})");
+            //JavaScript.ExecuteScript($"diagnostics.status({Quote(caption)})");
         }
 
         public void Warn(ICodeLocation location, string message)
         {
-            throw new NotImplementedException();
+            ctx.GetTaskRunner().PostTask(new DiagnosticTask(this.ctx, $"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>"));
         }
 
         public void Warn(ICodeLocation location, string message, params object[] args)
@@ -149,6 +152,26 @@ namespace Reko.Chromely.RekoHosting
             public void NavigateTo()
             {
                 throw new NotSupportedException();
+            }
+        }
+
+        private class DiagnosticTask : CefTask
+        {
+            private CefV8Context ctx;
+            private string sHtml;
+
+            public DiagnosticTask(CefV8Context ctx, string sHtml)
+            {
+                this.ctx = ctx;
+                this.sHtml = sHtml;
+            }
+
+            protected override void Execute()
+            {
+                ctx.Acquire(() =>
+                {
+                    //$TODO: smx-smx call back to the JS side, passing a blob of html
+                });
             }
         }
 
