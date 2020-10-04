@@ -5,10 +5,18 @@
     cursor: pointer
 }
 
-    .klikme:hover {
-        background-color: #802D2D
-    }
+.klikme:hover {
+    background-color: #802D2D
+}
 
 #openFile {
     display: none
 }
+
+#imgGenerated {
+    height: 30px;
+    width: 300px;
+    border: solid 1px #CCCCCC;
+    padding: 3px;
+}
+

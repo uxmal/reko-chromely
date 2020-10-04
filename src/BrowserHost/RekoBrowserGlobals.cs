@@ -111,6 +111,7 @@ namespace Reko.Chromely.BrowserHost
                 //RegisterFunction<Proto_DisassembleRandomBytes>("Proto_DisassembleRandomBytes", rekoObj);
                 RegisterAsyncFunction(rekoObj, "OpenFile", Proto_OpenFile.ExecuteAsync, new Proto_OpenFileHandlerFactory(pendingPromises));
 				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", Proto_DisassembleRandomBytes.Execute);
+                RegisterAsyncFunction(rekoObj, "Proto_GeneratePng", Proto_GeneratePng.Execute);
 			});
 		}
 	}
