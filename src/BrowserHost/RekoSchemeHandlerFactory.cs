@@ -2,15 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Web;
 using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
+    /// <summary>
+    /// This factory creates <see cref="RekoResourceHandler"/> instances in response to requests from the browser.
+    /// </summary>
     public class RekoSchemeHandlerFactory : CefSchemeHandlerFactory
     {
         protected override CefResourceHandler Create(CefBrowser browser, CefFrame frame, string schemeName, CefRequest request)
         {
+            var query = request.Url;
             var bytes = Proto_GeneratePng.Generate();
+
             return new RekoResourceHandler(bytes, "image/png");
         }
 
