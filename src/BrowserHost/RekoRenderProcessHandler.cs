@@ -13,13 +13,14 @@ namespace Reko.Chromely.BrowserHost
 	/// </summary>
 	public class RekoRenderProcessHandler : CefRenderProcessHandler
 	{
-        private readonly PendingPromisesRepository pendingPromises = new PendingPromisesRepository();
-        private ServiceContainer services;
+        private readonly PendingPromisesRepository pendingPromises;
+        private readonly ServiceContainer services;
         private Decompiler? decompiler;
 
         public RekoRenderProcessHandler()
         {
             this.services = new ServiceContainer();
+            this.pendingPromises = new PendingPromisesRepository();
         }
 
 		/// <summary>
@@ -47,19 +48,20 @@ namespace Reko.Chromely.BrowserHost
             services.AddService(typeof(IConfigurationService), configSvc);
             services.AddService(typeof(IDiagnosticsService), diagSvc);
             services.AddService(typeof(IDecompiledFileService), dfSvc);
+            services.AddService(typeof(ITypeLibraryLoaderService), new TypeLibraryLoaderServiceImpl(services));
             var loader = new Reko.Loading.Loader(services);
             this.decompiler = new Reko.Decompiler(loader, services);
         }
 
         protected override bool OnProcessMessageReceived(CefBrowser browser, CefFrame frame, CefProcessId sourceProcess, CefProcessMessage message)
         {
-            if(message.Name == "openFileReply")
+            if (message.Name == "openFileReply")
             {
                 var promiseId = message.Arguments.GetInt(0);
                 var filePath = message.Arguments.GetString(1);
 
-                var promise = pendingPromises.PopPromise(promiseId);
-                if (filePath == null)
+                var promise = pendingPromises.RemovePromise(promiseId);
+                if (filePath is null)
                 {
                     promise.Reject(null!);
                 }

@@ -1,22 +1,16 @@
 ﻿using Caliburn.Light;
 using Chromely.CefGlue.Browser;
-using Chromely.Core;
 using Chromely.Core.Configuration;
 using Chromely.Core.Defaults;
-using Chromely.Core.Network;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading;
 using Xilium.CefGlue;
 using Xilium.CefGlue.Wrapper;
 
 namespace Reko.Chromely.BrowserHost
 {
-	public class RekoBrowserHost
+    public class RekoBrowserHost
 	{
 		private const string WINDOW_TITLE = "Reko Decompiler";
 

@@ -28,11 +28,23 @@ namespace Reko.Chromely.BrowserHost
         /// </summary>
         /// <param name="ex">Exception to convert</param>
         /// <returns>A JS object with a 'message' and a 'trace' property.</returns>
-        private static CefV8Value MakeJsRejection(Exception ex)
+        private static CefV8Value MakeJsRejection(Exception? ex)
         {
+            var sbMessage = new StringBuilder();
+            var sbTrace = new StringBuilder();
+            var sep = "";
+            while (ex != null)
+            {
+                sbMessage.Append(sep);
+                sbMessage.Append(ex.Message);
+                sep = " ";
+                sbTrace.Append(ex.StackTrace);
+                sbTrace.AppendLine("---");
+                ex = ex.InnerException;
+            }
             var obj = CefV8Value.CreateObject();
-            obj.SetValue("message", CefV8Value.CreateString(ex.Message));
-            obj.SetValue("trace", CefV8Value.CreateString(ex.StackTrace));
+            obj.SetValue("message", CefV8Value.CreateString(sbMessage.ToString()));
+            obj.SetValue("trace", CefV8Value.CreateString(sbTrace.ToString()));
             return obj;
         }
 

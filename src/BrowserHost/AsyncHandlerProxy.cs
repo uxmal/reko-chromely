@@ -42,18 +42,11 @@ namespace Reko.Chromely.BrowserHost
         private readonly CefPromiseFactory promiseFactory;
         private readonly IPromiseHandlerFactory handlerFactory;
 
-        public AsyncHandlerProxy(Delegate func, CefPromiseFactory promiseFactory, IPromiseHandlerFactory? handlerFactory = null)
+        public AsyncHandlerProxy(Delegate func, CefPromiseFactory promiseFactory, IPromiseHandlerFactory handlerFactory)
         {
             this.func = func;
             this.promiseFactory = promiseFactory;
-            if (handlerFactory != null)
-            {
-                this.handlerFactory = handlerFactory;
-            }
-            else
-            {
-                this.handlerFactory = new DefaultPromiseHandlerFactory();
-            }
+            this.handlerFactory = handlerFactory;
         }
 
         /// <summary>

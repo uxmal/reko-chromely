@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.Security.Authentication.ExtendedProtection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,54 +30,51 @@ using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
+    /// <summary>
+    /// This class implements an Execute method that is used to start the C# worker
+    /// method. The method is run on a worker thread, and when it is completed or fails,
+    /// posts a <see cref="PromiseTask"/> which resolves or rejects the JS promise.
+    /// </summary>
     public class PromiseHandler : CefV8Handler
     {
-        private readonly Delegate promiseBody;
+        private readonly Delegate promiseWorker;
         private readonly object?[] callerArguments;
 
-        public PromiseHandler(Delegate promiseBody, object?[] arguments)
+        public PromiseHandler(Delegate promiseWorker, object?[] arguments)
         {
-            this.promiseBody = promiseBody;
+            this.promiseWorker = promiseWorker;
             this.callerArguments = arguments;
         }
 
-        protected virtual void OnExecuteSync(PromiseTask promise)
-        {
-        }
-
         /// <summary>
-        /// Start executing the promise.
+        /// Start executing the promise worker on a thread pool thread.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="obj"></param>
-        /// <param name="arguments"></param>
-        /// <param name="returnValue"></param>
-        /// <param name="exception"></param>
-        /// <returns></returns>
+        /// <param name="arguments">The two callback provided by the JS side, one for resolving
+        /// and one for rejecting the JS Promise.
+        /// </param>
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
         {
             var resolveCb = arguments[0];
             var rejectCb = arguments[1];
 
             var ctx = CefV8Context.GetCurrentContext();
-            var promiseTask = new PromiseTask(ctx, callerArguments, resolveCb, rejectCb);
-
-            OnExecuteSync(promiseTask);
+            var promiseTask = new PromiseTask(ctx, resolveCb, rejectCb);
 
             Task.Run(() =>
             {
                 // Start running C# code in its own thread, no JS calls are allowed at this point.
                 try
                 {
-                    var result = promiseBody.Method.Invoke(promiseBody.Target, promiseTask.Arguments);
+                    var result = promiseWorker.Method.Invoke(promiseWorker.Target, callerArguments);
                     promiseTask.Resolve(result);
                 }
                 catch (Exception ex)
                 {
-                    promiseTask.Reject(ex.Message);
+                    promiseTask.Reject(ex);
                 }
             });
-
+            
+            // This method is equivalent to a 'void' JS function, so return 'undefined'.
             returnValue = CefV8Value.CreateUndefined();
             exception = null!;
             return true;

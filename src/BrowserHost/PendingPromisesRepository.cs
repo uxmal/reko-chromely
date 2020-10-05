@@ -20,7 +20,7 @@ namespace Reko.Chromely.BrowserHost
             return lastId++;
         }
 
-        public PromiseTask PopPromise(int promiseId)
+        public PromiseTask RemovePromise(int promiseId)
         {
             var promise = promises[promiseId];
             promises.Remove(promiseId);

@@ -28,7 +28,7 @@ namespace Reko.Chromely.BrowserHost
             }
             else
             {
-                msg.Arguments.SetString(1, filePaths.First());
+                msg.Arguments.SetString(1, filePaths[0]);
             }
 
             browser.GetMainFrame().SendProcessMessage(CefProcessId.Renderer, msg);

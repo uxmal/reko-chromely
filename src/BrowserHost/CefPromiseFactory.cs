@@ -28,23 +28,23 @@ namespace Reko.Chromely.BrowserHost
 {
     public class CefPromiseFactory
     {
-        private readonly CefV8Value promiseFactory;
+        private readonly CefV8Value jsPromiseFactory;
+
+        public CefPromiseFactory(CefV8Value jsCreatePromise)
+        {
+            jsPromiseFactory = jsCreatePromise;
+        }
 
         /// <summary>
-        /// Create a promise
+        /// Create a JS promise by calling back into JS that wraps the promise fulfiller.
         /// </summary>
         /// <remarks>Must be inside a <see cref="CefV8Context"/></remarks>
         /// <param name="ctx"></param>
-        /// <param name="functionBody">Function having 2 arguments: resolve, reject</param>
+        /// <param name="fulfiller">JS Function having 2 arguments: resolve, reject</param>
         /// <returns></returns>
-        public CefV8Value CreatePromise(CefV8Value functionBody)
+        public CefV8Value CreatePromise(CefV8Value fulfiller)
         {
-            return promiseFactory.ExecuteFunction(null, new CefV8Value[] { functionBody });
-        }
-
-        public CefPromiseFactory(CefV8Value createPromiseFunction)
-        {
-            promiseFactory = createPromiseFunction;
+            return jsPromiseFactory.ExecuteFunction(null, new CefV8Value[] { fulfiller });
         }
     }
 }

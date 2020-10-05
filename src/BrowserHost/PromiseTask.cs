@@ -16,19 +16,15 @@ namespace Reko.Chromely.BrowserHost
 
         public PromiseTask(
             CefV8Context ctx,
-            object?[] arguments,
             CefV8Value resolveCb, CefV8Value rejectCb)
         {
             this.ctx = ctx;
-            this.Arguments = arguments;
             this.resolveCb = resolveCb;
             this.rejectCb = rejectCb;
 
             this.toRun = CefV8Value.CreateUndefined();
             this.result = CefV8Value.CreateUndefined();
         }
-
-        public object?[] Arguments { get; }
 
         /// <summary>
         /// Defer the invocation of the JS Resolve method by posting a task onto the task 

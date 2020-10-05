@@ -94,13 +94,18 @@ namespace Reko.Chromely.BrowserHost
         private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Delegate func, IPromiseHandlerFactory? handlerFactory = null)
         {
             var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(
-                func, this.promiseFactory, handlerFactory
+                func, this.promiseFactory, handlerFactory ?? new DefaultPromiseHandlerFactory()
             ));
             jsObject.SetValue(functionName, handler);
         }
 
+        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, CefV8Handler handler)
+        {
+            jsObject.SetValue(functionName, CefV8Value.CreateFunction(functionName, handler));
+        }
+
         /// <summary>
-        /// Register custom variables and functions in the global context
+        /// Register custom variables and functions as the object 'reko' in the global context
         /// </summary>
         public void RegisterGlobals()
         {
@@ -110,7 +115,7 @@ namespace Reko.Chromely.BrowserHost
                 var rekoObj = CefV8Value.CreateObject();
 
                 global.SetValue("reko", rekoObj);
-                RegisterAsyncFunction(rekoObj, "OpenFile", new Func<string, string>(Proto_OpenFile.ExecuteAsync), new Proto_OpenFileHandlerFactory(pendingPromises));
+                RegisterAsyncFunction(rekoObj, "OpenFile", new OpenFileHandler(promiseFactory, pendingPromises));
 				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", new Func<string,string,string>(Proto_DisassembleRandomBytes.Execute));
                 RegisterAsyncFunction(rekoObj, "Proto_GeneratePng", new Func<int,byte[]>(Proto_GeneratePng.Execute));
                 RegisterAsyncFunction(rekoObj, "LoadFile", new Func<string, string, bool>(decompiler.Load));

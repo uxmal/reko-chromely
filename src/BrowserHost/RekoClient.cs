@@ -16,10 +16,10 @@ namespace Reko.Chromely.BrowserHost
         {
         }
 
-        protected override CefDialogHandler GetDialogHandler()
-        {
-            return dialogHandler;
-        }
+        //protected override CefDialogHandler GetDialogHandler()
+        //{
+        //    return dialogHandler;
+        //}
 
         protected override bool OnProcessMessageReceived(CefBrowser browser, CefFrame frame, CefProcessId sourceProcess, CefProcessMessage message)
         {
@@ -29,7 +29,7 @@ namespace Reko.Chromely.BrowserHost
 
                 var promiseId = message.Arguments.GetInt(0);
                 var cb = new RekoOpenFileDialogCallback(browser, promiseId);
-                host.RunFileDialog(CefFileDialogMode.Open, "Select a File to decompile", null, null, 0, cb);
+                host.RunFileDialog(CefFileDialogMode.Open, "Select a file to decompile", null, null, 0, cb);
                 return true;
             }
 
