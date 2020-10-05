@@ -37,7 +37,7 @@ namespace Reko.Chromely.BrowserHost.Functions
 {
 	public class Proto_DisassembleRandomBytes
 	{
-        public static object? Execute(object?[] arguments)
+        public static string Execute(string sAddress, string sOTherArg)
         {
             //Thread.Sleep(5000); // Simulate a slow running thread.
             var rnd = new Random();

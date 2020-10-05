@@ -32,9 +32,7 @@ namespace Reko.Chromely.BrowserHost
         {
             CreateRekoInstance(context);
 
-            //$TODO:Expose the Decompiler.Load/Scan/Analyze methods in RekoBrowserGlobals
-
-            new RekoBrowserGlobals(pendingPromises, context).RegisterGlobals();
+            new RekoBrowserGlobals(pendingPromises, this.decompiler!, context).RegisterGlobals();
         }
 
         private void CreateRekoInstance(CefV8Context context)
@@ -61,10 +59,11 @@ namespace Reko.Chromely.BrowserHost
                 var filePath = message.Arguments.GetString(1);
 
                 var promise = pendingPromises.PopPromise(promiseId);
-                if(filePath == null)
+                if (filePath == null)
                 {
                     promise.Reject(null!);
-                } else
+                }
+                else
                 {
                     promise.Resolve(filePath);
                 }

@@ -23,6 +23,7 @@
 
 using Chromely.CefGlue.Browser.Handlers;
 using Reko.Chromely.BrowserHost.Functions;
+using Reko.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,10 +42,12 @@ namespace Reko.Chromely.BrowserHost
         private readonly CefV8Context context;
         private readonly CefPromiseFactory promiseFactory;
         private readonly PendingPromisesRepository pendingPromises;
+        private readonly IDecompiler decompiler;
 
-        public RekoBrowserGlobals(PendingPromisesRepository pendingPromises, CefV8Context context)
+        public RekoBrowserGlobals(PendingPromisesRepository pendingPromises, IDecompiler decompiler, CefV8Context context)
         {
             this.pendingPromises = pendingPromises;
+            this.decompiler = decompiler;
             this.context = context;
             CefPromiseFactory promiseFactory = CreatePromiseFactory();
             this.promiseFactory = promiseFactory;
@@ -88,7 +91,7 @@ namespace Reko.Chromely.BrowserHost
         /// <param name="jsObject"></param>
         /// <param name="functionName"></param>
         /// <param name="func"></param>
-        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Func<object?[], object?> func, IPromiseHandlerFactory? handlerFactory = null)
+        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Delegate func, IPromiseHandlerFactory? handlerFactory = null)
         {
             var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(
                 func, this.promiseFactory, handlerFactory
@@ -107,11 +110,12 @@ namespace Reko.Chromely.BrowserHost
                 var rekoObj = CefV8Value.CreateObject();
 
                 global.SetValue("reko", rekoObj);
-                //RegisterFunction<Proto_DisassembleRandomBytes>("Proto_DisassembleRandomBytes", rekoObj);
-                RegisterAsyncFunction(rekoObj, "OpenFile", Proto_OpenFile.ExecuteAsync, new Proto_OpenFileHandlerFactory(pendingPromises));
-				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", Proto_DisassembleRandomBytes.Execute);
-                RegisterAsyncFunction(rekoObj, "Proto_GeneratePng", Proto_GeneratePng.Execute);
-			});
+                RegisterAsyncFunction(rekoObj, "OpenFile", new Func<string, string>(Proto_OpenFile.ExecuteAsync), new Proto_OpenFileHandlerFactory(pendingPromises));
+				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", new Func<string,string,string>(Proto_DisassembleRandomBytes.Execute));
+                RegisterAsyncFunction(rekoObj, "Proto_GeneratePng", new Func<int,byte[]>(Proto_GeneratePng.Execute));
+                RegisterAsyncFunction(rekoObj, "LoadFile", new Func<string, string, bool>(decompiler.Load));
+                RegisterAsyncFunction(rekoObj, "Scan", new Action(decompiler.ScanPrograms));
+            });
 		}
 	}
 }

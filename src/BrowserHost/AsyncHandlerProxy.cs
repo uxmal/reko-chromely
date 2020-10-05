@@ -30,7 +30,7 @@ namespace Reko.Chromely.BrowserHost
 {
     public class DefaultPromiseHandlerFactory : IPromiseHandlerFactory
     {
-        public CefV8Handler CreateHandler(Func<object?[], object?> promiseBody, object?[] arguments)
+        public CefV8Handler CreateHandler(Delegate promiseBody, object?[] arguments)
         {
             return new PromiseHandler(promiseBody, arguments);
         }
@@ -38,11 +38,11 @@ namespace Reko.Chromely.BrowserHost
 
     public class AsyncHandlerProxy : CefV8Handler
     {
-        private readonly Func<object?[], object?> func;
+        private readonly Delegate func;
         private readonly CefPromiseFactory promiseFactory;
         private readonly IPromiseHandlerFactory handlerFactory;
 
-        public AsyncHandlerProxy(Func<object?[], object?> func, CefPromiseFactory promiseFactory, IPromiseHandlerFactory? handlerFactory = null)
+        public AsyncHandlerProxy(Delegate func, CefPromiseFactory promiseFactory, IPromiseHandlerFactory? handlerFactory = null)
         {
             this.func = func;
             this.promiseFactory = promiseFactory;

@@ -5,7 +5,10 @@ using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
-    class ValueConverter
+    /// <summary>
+    /// Utility class that converts values to and from CefV8Values based on type.
+    /// </summary>
+    static class ValueConverter
     {
         public static CefV8Value ConvertToJsValue(object? value)
         {
@@ -14,12 +17,30 @@ namespace Reko.Chromely.BrowserHost
             return value switch
             {
                 string s => CefV8Value.CreateString(s),
+                bool b => CefV8Value.CreateBool(b),
+                Exception ex => MakeJsRejection(ex),
                 _ => throw new NotImplementedException()
             };
         }
 
+        /// <summary>
+        /// Make a js object out of an exception.
+        /// </summary>
+        /// <param name="ex">Exception to convert</param>
+        /// <returns>A JS object with a 'message' and a 'trace' property.</returns>
+        private static CefV8Value MakeJsRejection(Exception ex)
+        {
+            var obj = CefV8Value.CreateObject();
+            obj.SetValue("message", CefV8Value.CreateString(ex.Message));
+            obj.SetValue("trace", CefV8Value.CreateString(ex.StackTrace));
+            return obj;
+        }
+
         public static object? ConvertFromJsValue(CefV8Value jsValue)
         {
+            //$TODO: file an issue complaining about the lack of a 'int CefV8Value.GetValueType()' method
+            // so this totem-pole could be converted to a simpler switch statement/expression.
+
             if (jsValue.IsNull)
                 return null;
             if (jsValue.IsUndefined)
@@ -43,6 +64,11 @@ namespace Reko.Chromely.BrowserHost
             throw new NotImplementedException($"JS type not handled in {nameof(ValueConverter)}.{nameof(ConvertFromJsValue)}: {jsValue}.");
         }
 
+        /// <summary>
+        /// Convert an array of JS values to their .NET counterparts.
+        /// </summary>
+        /// <param name="jsValues">Array of JS values to convert.</param>
+        /// <returns>An array of converted .NET objects.</returns>
         public static object?[] ConvertFromJsValues(CefV8Value[] jsValues)
         {
             object?[] result = new object?[jsValues.Length];

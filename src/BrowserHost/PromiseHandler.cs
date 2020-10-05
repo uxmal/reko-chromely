@@ -31,10 +31,10 @@ namespace Reko.Chromely.BrowserHost
 {
     public class PromiseHandler : CefV8Handler
     {
-        private readonly Func<object?[], object?> promiseBody;
+        private readonly Delegate promiseBody;
         private readonly object?[] callerArguments;
 
-        public PromiseHandler(Func<object?[], object?> promiseBody, object?[] arguments)
+        public PromiseHandler(Delegate promiseBody, object?[] arguments)
         {
             this.promiseBody = promiseBody;
             this.callerArguments = arguments;
@@ -65,10 +65,10 @@ namespace Reko.Chromely.BrowserHost
 
             Task.Run(() =>
             {
-                // Start running C# code in its own thread, No JS calls are allowed at this point.
+                // Start running C# code in its own thread, no JS calls are allowed at this point.
                 try
                 {
-                    var result = promiseBody(promiseTask.Arguments);
+                    var result = promiseBody.Method.Invoke(promiseBody.Target, promiseTask.Arguments);
                     promiseTask.Resolve(result);
                 }
                 catch (Exception ex)

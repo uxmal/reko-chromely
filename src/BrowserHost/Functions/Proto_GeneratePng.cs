@@ -33,9 +33,9 @@ namespace Reko.Chromely.BrowserHost.Functions
             return bytes;
         }
 
-        public static object? Execute(object? [] arguments)
+        public static byte[] Execute(int percentage)
         {
-            var bytes = Generate(100);
+            var bytes = Generate(percentage);
             return bytes;
         }
     }

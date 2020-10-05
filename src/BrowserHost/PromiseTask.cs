@@ -63,7 +63,7 @@ namespace Reko.Chromely.BrowserHost
             ctx.Acquire(() =>
             {
                 // We just got called from the JS runtime task runner. We are in a JS context,
-                // so it's safeto create JS values.
+                // so it's safe to create JS values.
                 var result = ValueConverter.ConvertToJsValue(this.result);
                 // Now we can call the resolve JS function with our converted value.
                 this.toRun.ExecuteFunction(null, new CefV8Value[] { result });
