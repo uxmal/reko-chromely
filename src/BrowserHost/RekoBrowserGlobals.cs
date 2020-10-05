@@ -91,11 +91,9 @@ namespace Reko.Chromely.BrowserHost
         /// <param name="jsObject"></param>
         /// <param name="functionName"></param>
         /// <param name="func"></param>
-        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Delegate func, IPromiseHandlerFactory? handlerFactory = null)
+        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Delegate func)
         {
-            var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(
-                func, this.promiseFactory, handlerFactory ?? new DefaultPromiseHandlerFactory()
-            ));
+            var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(func, this.promiseFactory));
             jsObject.SetValue(functionName, handler);
         }
 

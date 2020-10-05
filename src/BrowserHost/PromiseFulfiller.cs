@@ -21,31 +21,17 @@
 // THE SOFTWARE.
 #endregion
 
-using System;
-using System.Diagnostics;
-using System.Security.Authentication.ExtendedProtection;
-using System.Threading;
-using System.Threading.Tasks;
 using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
     /// <summary>
     /// This class implements an Execute method that is used to start the C# worker
-    /// method. The method is run on a worker thread, and when it is completed or fails,
-    /// posts a <see cref="PromiseTask"/> which resolves or rejects the JS promise.
+    /// method. The method is run "asynchronously" somehow using the <see cref="DoAsyncWork(CefV8Context, PromiseTask)"/> method,
+    /// and when it is completed or fails, posts a <see cref="PromiseTask"/> which fulfills the JS promise.
     /// </summary>
-    public class PromiseHandler : CefV8Handler
+    public abstract class PromiseFulfiller : CefV8Handler
     {
-        private readonly Delegate promiseWorker;
-        private readonly object?[] callerArguments; // Arguments passed to the function that made the JS promise.
-
-        public PromiseHandler(Delegate promiseWorker, object?[] arguments)
-        {
-            this.promiseWorker = promiseWorker;
-            this.callerArguments = arguments;
-        }
-
         /// <summary>
         /// Start executing the promise worker on a thread pool thread.
         /// </summary>
@@ -60,24 +46,16 @@ namespace Reko.Chromely.BrowserHost
             var ctx = CefV8Context.GetCurrentContext();
             var promiseTask = new PromiseTask(ctx, resolveCb, rejectCb);
 
-            Task.Run(() =>
-            {
-                // Start running C# code in its own thread, no JS calls are allowed at this point.
-                try
-                {
-                    var result = promiseWorker.Method.Invoke(promiseWorker.Target, callerArguments);
-                    promiseTask.Resolve(result);
-                }
-                catch (Exception ex)
-                {
-                    promiseTask.Reject(ex);
-                }
-            });
-            
-            // This method is equivalent to a 'void' JS function, so return 'undefined'.
+            DoAsyncWork(ctx, promiseTask);
+
+            // A fulfiller function doesn't return anything -- it's equivalent to
+            // a 'void' C# function, so return 'undefined' to JS side.
             returnValue = CefV8Value.CreateUndefined();
             exception = null!;
             return true;
         }
+
+
+        protected abstract void DoAsyncWork(CefV8Context ctx, PromiseTask promiseTask);
     }
 }

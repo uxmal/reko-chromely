@@ -36,12 +36,11 @@ namespace Reko.Chromely.BrowserHost
         }
 
         /// <summary>
-        /// Create a JS promise by calling back into JS that wraps the promise fulfiller.
+        /// Create a JS promise by calling back into JS, returning a Promise that wraps the 
+        /// provided fulfiller.
         /// </summary>
         /// <remarks>Must be inside a <see cref="CefV8Context"/></remarks>
-        /// <param name="ctx"></param>
         /// <param name="fulfiller">JS Function having 2 arguments: resolve, reject</param>
-        /// <returns></returns>
         public CefV8Value CreatePromise(CefV8Value fulfiller)
         {
             return jsPromiseFactory.ExecuteFunction(null, new CefV8Value[] { fulfiller });

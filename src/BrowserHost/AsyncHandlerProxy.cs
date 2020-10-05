@@ -22,31 +22,20 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
-    public class DefaultPromiseHandlerFactory : IPromiseHandlerFactory
-    {
-        public CefV8Handler CreateHandler(Delegate promiseBody, object?[] arguments)
-        {
-            return new PromiseHandler(promiseBody, arguments);
-        }
-    }
-
     public class AsyncHandlerProxy : CefV8Handler
     {
         private readonly Delegate func;
         private readonly CefPromiseFactory promiseFactory;
-        private readonly IPromiseHandlerFactory handlerFactory;
 
-        public AsyncHandlerProxy(Delegate func, CefPromiseFactory promiseFactory, IPromiseHandlerFactory handlerFactory)
+        public AsyncHandlerProxy(Delegate func, CefPromiseFactory promiseFactory)
         {
             this.func = func;
             this.promiseFactory = promiseFactory;
-            this.handlerFactory = handlerFactory;
         }
 
         /// <summary>
@@ -54,15 +43,48 @@ namespace Reko.Chromely.BrowserHost
         /// </summary>
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
         {
-            // create the promise body
+            // Create the promise fulfiller.
             var oArgs = ValueConverter.ConvertFromJsValues(arguments);
-            var promiseBody = CefV8Value.CreateFunction("(anonymous)", handlerFactory.CreateHandler(func, oArgs));
+            var fulfiller = CefV8Value.CreateFunction("(anonymous)", new ThreadPoolFulfiller(func, oArgs));
 
             // create the promise object
-            returnValue = promiseFactory.CreatePromise(promiseBody);
+            returnValue = promiseFactory.CreatePromise(fulfiller);
 
             exception = null!;
             return true;
+        }
+
+        /// <summary>
+        /// This class fulfills a JS promise by executing its workload on a thread pool task. Once the task is completed,
+        /// it fulfills the promise via the supplied <see cref="PromiseTask"/>.
+        /// </summary>
+        public class ThreadPoolFulfiller : PromiseFulfiller
+        {
+            private readonly Delegate promiseWorker;
+            private readonly object?[] callerArguments; // Arguments passed to the function that made the JS promise.
+
+            public ThreadPoolFulfiller(Delegate promiseWorker, object?[] arguments)
+            {
+                this.promiseWorker = promiseWorker;
+                this.callerArguments = arguments;
+            }
+
+            protected override void DoAsyncWork(CefV8Context ctx, PromiseTask promiseTask)
+            {
+                // Start running C# code in its own thread, no JS calls are allowed at this point.
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        var result = promiseWorker.Method.Invoke(promiseWorker.Target, callerArguments);
+                        promiseTask.Resolve(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        promiseTask.Reject(ex);
+                    }
+                });
+            }
         }
     }
 }
