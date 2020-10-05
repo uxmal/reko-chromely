@@ -24,8 +24,10 @@
 using Chromely.CefGlue.Browser.Handlers;
 using Reko.Chromely.BrowserHost.Functions;
 using Reko.Core;
+using Reko.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -42,11 +44,18 @@ namespace Reko.Chromely.BrowserHost
         private readonly CefV8Context context;
         private readonly CefPromiseFactory promiseFactory;
         private readonly PendingPromisesRepository pendingPromises;
+        private readonly EventListenersRepository eventListeners;
+        private readonly ServiceContainer services;
         private readonly IDecompiler decompiler;
 
-        public RekoBrowserGlobals(PendingPromisesRepository pendingPromises, IDecompiler decompiler, CefV8Context context)
+        public RekoBrowserGlobals(
+            PendingPromisesRepository pendingPromises, EventListenersRepository eventListeners,
+            ServiceContainer services, IDecompiler decompiler, CefV8Context context
+        )
         {
             this.pendingPromises = pendingPromises;
+            this.eventListeners = eventListeners;
+            this.services = services;
             this.decompiler = decompiler;
             this.context = context;
             CefPromiseFactory promiseFactory = CreatePromiseFactory();
@@ -85,6 +94,16 @@ namespace Reko.Chromely.BrowserHost
             jsObject.SetValue(functionName, handler);
         }
 
+        private void RegisterFunction(CefV8Value jsObject, string functionName, CefV8Handler handler)
+        {
+            jsObject.SetValue(functionName, CefV8Value.CreateFunction(functionName, handler));
+        }
+
+        private void RegisterFunction(CefV8Value jsObject, string functionName, Delegate func)
+        {
+            jsObject.SetValue(functionName, CefV8Value.CreateFunction(functionName, new HandlerProxy(func)));
+        }
+
         /// <summary>
         /// Add an asynchronous method to the supplied JavaScript object
         /// </summary>
@@ -118,6 +137,12 @@ namespace Reko.Chromely.BrowserHost
                 RegisterAsyncFunction(rekoObj, "Proto_GeneratePng", new Func<int,byte[]>(Proto_GeneratePng.Execute));
                 RegisterAsyncFunction(rekoObj, "LoadFile", new Func<string, string, bool>(decompiler.Load));
                 RegisterAsyncFunction(rekoObj, "Scan", new Action(decompiler.ScanPrograms));
+                RegisterFunction(rekoObj, "TestListener", new Action(() =>
+                {
+                    var listener = services.RequireService<DecompilerEventListener>();
+                    listener.Info(new NullCodeLocation("web"), "Hello World");
+                }));
+                RegisterFunction(rekoObj, "RegisterEventListener", new Proto_RegisterEventListener(eventListeners));
             });
 		}
 	}

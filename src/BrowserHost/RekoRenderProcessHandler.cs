@@ -39,11 +39,13 @@ namespace Reko.Chromely.BrowserHost
         private readonly PendingPromisesRepository pendingPromises;
         private readonly ServiceContainer services;
         private Decompiler? decompiler;
+        private EventListenersRepository eventListeners;
 
         public RekoRenderProcessHandler()
         {
             this.services = new ServiceContainer();
             this.pendingPromises = new PendingPromisesRepository();
+            this.eventListeners = new EventListenersRepository();
         }
 
 		/// <summary>
@@ -56,13 +58,13 @@ namespace Reko.Chromely.BrowserHost
         {
             CreateRekoInstance(context);
 
-            new RekoBrowserGlobals(pendingPromises, this.decompiler!, context).RegisterGlobals();
+            new RekoBrowserGlobals(pendingPromises, eventListeners, services, this.decompiler!, context).RegisterGlobals();
         }
 
         private void CreateRekoInstance(CefV8Context context)
         {
             var fsSvc = new FileSystemServiceImpl();
-            var listener = new ListenerService(context);
+            var listener = new ListenerService(context, eventListeners);
             var diagSvc = new DiagnosticsService(listener, context);
             var dfSvc = new DecompiledFileService(fsSvc);
             services.AddService(typeof(IFileSystemService), fsSvc);

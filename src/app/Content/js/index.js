@@ -27,6 +27,15 @@
             //$TODO: pass a parameter
             //let image = await window.reko.Proto_GeneratePng();
         });
+
+        let handlerId = window.reko.RegisterEventListener("Listener.Info", msg => {
+            $("#diagnosticsWindow").append(msg);
+        });
+        console.log("Registered, id: " + handlerId);
+
+        for (i = 0; i < 5; i++) {
+            window.reko.TestListener();
+        }
     });
 
     diagnostics = {

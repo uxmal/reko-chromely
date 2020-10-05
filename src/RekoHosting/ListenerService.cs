@@ -40,9 +40,24 @@ namespace Reko.Chromely.RekoHosting
         private bool canceled;
         private CefV8Context ctx;
 
-        public ListenerService(CefV8Context ctx)
+        private readonly EventListenersRepository eventListeners;
+
+        private const string EV_ERROR = "Listener.Error";
+        private const string EV_INFO = "Listener.Info";
+        private const string EV_WARN = "Listener.Warn";
+
+        public ListenerService(CefV8Context ctx, EventListenersRepository eventListeners)
         {
             this.ctx = ctx;
+            this.eventListeners = eventListeners;
+            RegisterEvents();
+        }
+
+        private void RegisterEvents()
+        {
+            eventListeners.RegisterEvent(EV_ERROR);
+            eventListeners.RegisterEvent(EV_INFO);
+            eventListeners.RegisterEvent(EV_WARN);
         }
 
         public void Cancel()
@@ -87,7 +102,13 @@ namespace Reko.Chromely.RekoHosting
 
         public void Error(ICodeLocation location, string message)
         {
-            ctx.GetTaskRunner().PostTask(new DiagnosticTask(this.ctx, $"<div class='diag-err'><div>NYI</div><div>{message}</div></div>"));
+            ctx.Acquire(() =>
+            {
+                eventListeners.Invoke(EV_ERROR, new CefV8Value[]
+                {
+                    CefV8Value.CreateString($"<div class='diag-err'><div>NYI</div><div>{message}</div></div>")
+                });
+            });
         }
 
         public void Error(ICodeLocation location, string message, params object[] args)
@@ -107,7 +128,13 @@ namespace Reko.Chromely.RekoHosting
 
         public void Info(ICodeLocation location, string message)
         {
-            ctx.GetTaskRunner().PostTask(new DiagnosticTask(this.ctx, $"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>"));
+            ctx.Acquire(() =>
+            {
+                eventListeners.Invoke(EV_INFO, new CefV8Value[]
+                {
+                    CefV8Value.CreateString($"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>")
+                });
+            });
         }
 
         public void Info(ICodeLocation location, string message, params object[] args)
@@ -132,7 +159,13 @@ namespace Reko.Chromely.RekoHosting
 
         public void Warn(ICodeLocation location, string message)
         {
-            ctx.GetTaskRunner().PostTask(new DiagnosticTask(this.ctx, $"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>"));
+            ctx.Acquire(() =>
+            {
+                eventListeners.Invoke(EV_WARN, new CefV8Value[]
+                {
+                    CefV8Value.CreateString($"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>")
+                });
+            });
         }
 
         public void Warn(ICodeLocation location, string message, params object[] args)

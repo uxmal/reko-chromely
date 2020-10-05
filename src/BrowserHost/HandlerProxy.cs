@@ -30,9 +30,9 @@ namespace Reko.Chromely.BrowserHost
 {
     public class HandlerProxy : CefV8Handler
     {
-        private readonly Func<CefV8Value[], CefV8Value> func;
+        private readonly Delegate func;
 
-        public HandlerProxy(Func<CefV8Value[], CefV8Value> func)
+        public HandlerProxy(Delegate func)
         {
             this.func = func;
         }
@@ -44,7 +44,8 @@ namespace Reko.Chromely.BrowserHost
         {
             try
             {
-                returnValue = func(arguments);
+                var result = func.Method.Invoke(func.Target, arguments);
+                returnValue = ValueConverter.ConvertToJsValue(result);
                 exception = null!;
             }
             catch (Exception ex)
