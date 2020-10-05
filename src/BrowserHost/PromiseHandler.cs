@@ -38,7 +38,7 @@ namespace Reko.Chromely.BrowserHost
     public class PromiseHandler : CefV8Handler
     {
         private readonly Delegate promiseWorker;
-        private readonly object?[] callerArguments;
+        private readonly object?[] callerArguments; // Arguments passed to the function that made the JS promise.
 
         public PromiseHandler(Delegate promiseWorker, object?[] arguments)
         {
