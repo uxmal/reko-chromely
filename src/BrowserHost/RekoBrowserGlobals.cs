@@ -23,6 +23,7 @@
 
 using Chromely.CefGlue.Browser.Handlers;
 using Reko.Chromely.BrowserHost.Functions;
+using Reko.Chromely.Renderers;
 using Reko.Core;
 using Reko.Core.Services;
 using System;
@@ -49,8 +50,11 @@ namespace Reko.Chromely.BrowserHost
         private readonly IDecompiler decompiler;
 
         public RekoBrowserGlobals(
-            PendingPromisesRepository pendingPromises, EventListenersRepository eventListeners,
-            ServiceContainer services, IDecompiler decompiler, CefV8Context context
+            PendingPromisesRepository pendingPromises,
+            EventListenersRepository eventListeners,
+            ServiceContainer services,
+            IDecompiler decompiler,
+            CefV8Context context
         )
         {
             this.pendingPromises = pendingPromises;
@@ -143,6 +147,7 @@ namespace Reko.Chromely.BrowserHost
                     listener.Info(new NullCodeLocation("web"), "Hello World");
                 }));
                 RegisterFunction(rekoObj, "RegisterEventListener", new Proto_RegisterEventListener(eventListeners));
+                RegisterFunction(rekoObj, "RenderProjectView", new Func<string>(() => ProjectViewRenderer.RenderToHtml(decompiler)));
             });
 		}
 	}

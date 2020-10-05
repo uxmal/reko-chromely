@@ -27,7 +27,7 @@ namespace Reko.Chromely.BrowserHost
 
         public void Invoke(CefV8Value[] arguments)
         {
-            foreach(var handler in eventHandlers.Values)
+            foreach (var handler in eventHandlers.Values)
             {
                 handler.ExecuteFunction(null, arguments);
             }
@@ -58,6 +58,5 @@ namespace Reko.Chromely.BrowserHost
         {
             eventListeners[eventName].Invoke(arguments);
         }
-
     }
 }
