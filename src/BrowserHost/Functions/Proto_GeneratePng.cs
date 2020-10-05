@@ -33,10 +33,10 @@ namespace Reko.Chromely.BrowserHost.Functions
             return bytes;
         }
 
-        public static void Execute(PromiseTask promise)
+        public static object? Execute(object? [] arguments)
         {
             var bytes = Generate(100);
-            promise.Resolve(bytes);
+            return bytes;
         }
     }
 }

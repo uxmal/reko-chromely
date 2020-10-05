@@ -7,7 +7,7 @@ namespace Reko.Chromely.BrowserHost
 {
     public class PendingPromisesHandlerFactory : IPromiseHandlerFactory
     {
-        public CefV8Handler CreateHandler(Action<PromiseTask> promiseBody, CefV8Value[] arguments)
+        public CefV8Handler CreateHandler(Func<object?[], object?> promiseBody, object?[] arguments)
         {
             throw new NotImplementedException();
         }

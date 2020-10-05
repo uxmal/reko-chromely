@@ -15,7 +15,7 @@ namespace Reko.Chromely.BrowserHost.Functions
             this.pendingPromises = pendingPromises;
         }
 
-        public CefV8Handler CreateHandler(Action<PromiseTask> promiseBody, CefV8Value[] arguments)
+        public CefV8Handler CreateHandler(Func<object?[], object?> promiseBody, object?[] arguments)
         {
             return new Proto_OpenFile(pendingPromises, promiseBody, arguments);
         }
@@ -27,8 +27,9 @@ namespace Reko.Chromely.BrowserHost.Functions
 
         public Proto_OpenFile(
             PendingPromisesRepository pendingPromises,
-            Action<PromiseTask> promiseBody, CefV8Value[] arguments
-        ) : base(promiseBody, arguments)
+            Func<object?[], object?> promiseBody,
+            object?[] arguments)
+            : base(promiseBody, arguments)
         {
             this.pendingPromises = pendingPromises;
         }
@@ -47,8 +48,9 @@ namespace Reko.Chromely.BrowserHost.Functions
             frame.SendProcessMessage(CefProcessId.Browser, msg);
         }
 
-        public static void ExecuteAsync(PromiseTask task)
+        public static object? ExecuteAsync(object? [] arguments)
         {
+            return null;
         }
     }
 }

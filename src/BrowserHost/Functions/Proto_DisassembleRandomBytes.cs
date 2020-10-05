@@ -37,7 +37,7 @@ namespace Reko.Chromely.BrowserHost.Functions
 {
 	public class Proto_DisassembleRandomBytes
 	{
-        public static void Execute(PromiseTask promise)
+        public static object? Execute(object?[] arguments)
         {
             //Thread.Sleep(5000); // Simulate a slow running thread.
             var rnd = new Random();
@@ -55,8 +55,7 @@ namespace Reko.Chromely.BrowserHost.Functions
                 instr.Render(renderer, options);
             }
             var sDasm = sw.ToString();
-            
-            promise.Resolve(sDasm);
+            return sDasm;
         }
     }
 }

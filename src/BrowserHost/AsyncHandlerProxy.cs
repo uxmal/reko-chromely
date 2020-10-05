@@ -30,7 +30,7 @@ namespace Reko.Chromely.BrowserHost
 {
     public class DefaultPromiseHandlerFactory : IPromiseHandlerFactory
     {
-        public CefV8Handler CreateHandler(Action<PromiseTask> promiseBody, CefV8Value[] arguments)
+        public CefV8Handler CreateHandler(Func<object?[], object?> promiseBody, object?[] arguments)
         {
             return new PromiseHandler(promiseBody, arguments);
         }
@@ -38,18 +38,19 @@ namespace Reko.Chromely.BrowserHost
 
     public class AsyncHandlerProxy : CefV8Handler
     {
-        private readonly Action<PromiseTask> func;
+        private readonly Func<object?[], object?> func;
         private readonly CefPromiseFactory promiseFactory;
         private readonly IPromiseHandlerFactory handlerFactory;
 
-        public AsyncHandlerProxy(Action<PromiseTask> func, CefPromiseFactory promiseFactory, IPromiseHandlerFactory? handlerFactory = null)
+        public AsyncHandlerProxy(Func<object?[], object?> func, CefPromiseFactory promiseFactory, IPromiseHandlerFactory? handlerFactory = null)
         {
             this.func = func;
             this.promiseFactory = promiseFactory;
             if (handlerFactory != null)
             {
                 this.handlerFactory = handlerFactory;
-            } else
+            }
+            else
             {
                 this.handlerFactory = new DefaultPromiseHandlerFactory();
             }
@@ -61,7 +62,8 @@ namespace Reko.Chromely.BrowserHost
         protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue, out string exception)
         {
             // create the promise body
-            var promiseBody = CefV8Value.CreateFunction("(anonymous)", handlerFactory.CreateHandler(func, arguments));
+            var oArgs = ValueConverter.ConvertFromJsValues(arguments);
+            var promiseBody = CefV8Value.CreateFunction("(anonymous)", handlerFactory.CreateHandler(func, oArgs));
 
             // create the promise object
             returnValue = promiseFactory.CreatePromise(promiseBody);

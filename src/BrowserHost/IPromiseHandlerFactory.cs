@@ -5,6 +5,6 @@ namespace Reko.Chromely.BrowserHost
 {
     public interface IPromiseHandlerFactory
     {
-        CefV8Handler CreateHandler(Action<PromiseTask> promiseBody, CefV8Value[] arguments);
+        CefV8Handler CreateHandler(Func<object?[], object?> promiseBody, object?[] arguments);
     }
 }

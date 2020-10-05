@@ -88,7 +88,7 @@ namespace Reko.Chromely.BrowserHost
         /// <param name="jsObject"></param>
         /// <param name="functionName"></param>
         /// <param name="func"></param>
-        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Action<PromiseTask> func, IPromiseHandlerFactory handlerFactory = null)
+        private void RegisterAsyncFunction(CefV8Value jsObject, string functionName, Func<object?[], object?> func, IPromiseHandlerFactory? handlerFactory = null)
         {
             var handler = CefV8Value.CreateFunction(functionName, new AsyncHandlerProxy(
                 func, this.promiseFactory, handlerFactory
@@ -105,7 +105,6 @@ namespace Reko.Chromely.BrowserHost
 
                 var global = context.GetGlobal();
                 var rekoObj = CefV8Value.CreateObject();
-
 
                 global.SetValue("reko", rekoObj);
                 //RegisterFunction<Proto_DisassembleRandomBytes>("Proto_DisassembleRandomBytes", rekoObj);
