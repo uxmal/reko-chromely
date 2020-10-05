@@ -12,12 +12,16 @@
             $("#dasmWin").html("Cleared!");
         })
         $("#openFile").click(async e => {
-            e.preventDefault();
-            var filePath = await window.reko.OpenFile(e.target.value);
-            await window.reko.LoadFile(filePath);       // make sense? Now there is a loaded instance.
-            updateAllWindows();                         // this would suck in info from the REko object (procedures, segments)
-            // it would also update the image map, the "heat map" etc. But one thing at a time.
-            alert(`Opened file ${filePath}`);
+            try {
+                e.preventDefault();
+                var filePath = await window.reko.OpenFile(e.target.value);
+                await window.reko.LoadFile(filePath, null);    // Ask Reko to load the file.
+                // updateAllWindows();                         // Now we can pull objects from the Reko instance (procedures, segments)
+                // it would also update the image map, the "heat map" etc. But one thing at a time.
+                alert(`Opened file ${filePath}`);
+            } catch (err) {
+                alert(`An error happened ${err}`);
+            }    
         });
         $("#cmdGeneratePng").click(e => {
             //$TODO: pass a parameter
