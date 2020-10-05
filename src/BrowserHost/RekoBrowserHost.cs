@@ -23,8 +23,14 @@
 
 using Caliburn.Light;
 using Chromely.CefGlue.Browser;
+using Chromely.Core;
 using Chromely.Core.Configuration;
 using Chromely.Core.Defaults;
+using Chromely.Core.Host;
+using Chromely.Core.Network;
+using Chromely.Native;
+using Chromely.Windows;
+using Reko.Chromely.BrowserHost.ChromelyExtensions;
 using System;
 using System.IO;
 using System.Reflection;
@@ -33,122 +39,16 @@ using Xilium.CefGlue.Wrapper;
 
 namespace Reko.Chromely.BrowserHost
 {
-    public class RekoBrowserHost
+    public class RekoBrowserHost : ExtensibleBrowserHost
 	{
-		private const string WINDOW_TITLE = "Reko Decompiler";
-
-		private static IChromelyConfiguration CreateConfiguration() {
-			return new DefaultConfiguration();
-		}
-
-		private static CefSettings CreateSettings() {
-			return new CefSettings() {
-				MultiThreadedMessageLoop = false,
-				NoSandbox = true
-			};
+        protected override ExtensibleGlueBrowser CreateBrowser()
+        {
+            return new RekoGlueBrowser(this, _container, _config, _commandTaskRunner, _browserMessageRouter, new CefBrowserSettings());
         }
-
-		private static CefMessageRouterBrowserSide CreateRouter() {
-			var routerConfig = new CefMessageRouterConfig();
-			return new CefMessageRouterBrowserSide(routerConfig);
-		}
-		
-		private static CefBrowserSettings CreateBrowserSettings() {
-			return new CefBrowserSettings();
-		}
-
-		/// <summary>
-		/// Creates the window construction parameters
-		/// <see cref="CefWindowInfo"/> describes how we want the window to be created
-		/// </summary>
-		/// <returns></returns>
-		private static CefWindowInfo CreateWindowInfo() {
-			var windowInfo = CefWindowInfo.Create();
-			windowInfo.SetAsPopup(IntPtr.Zero, WINDOW_TITLE);
-			return windowInfo;
-		}
-
-        private CefGlueBrowser CreateBrowserObject() {
-			var router = CreateRouter();          
-
-			var container = new SimpleContainer();
-			var taskRunner = new DefaultCommandTaskRunner(container);
-
-			var browserSettings = CreateBrowserSettings();
-			return new RekoGlueBrowser(this, container, config, taskRunner, router, browserSettings);
-		}
-
-		private readonly IChromelyConfiguration config;
-		private readonly RekoBrowserApp app;
-
-		private RekoGlueBrowser? browser;
-		private CefBrowserHost? host;
-		private bool running = false;
-
-		private readonly string initialUrl;
-
-		public RekoBrowserHost() {
-			this.config = CreateConfiguration();
-			this.app = new RekoBrowserApp(config);
-
-			// Obtain the html url relative to the executing assembly
-			var baseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-			initialUrl = Path.Combine(baseDirectory!, "app", "index.html");
-		}
-
-		/// <summary>
-		/// Create the browser and start the blocking message loop
-		/// </summary>
-		public int Run(string[] args) {
-            CefRuntime.Load();
-            var mainArgs = new CefMainArgs(args);
-            
-            // fork. -1 indicates a browser process has been created
-            int exitCode = CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero);
-            if (exitCode != -1) {
-				/**
-				 * if we get here, we're not running on the browser process.
-				 * since the initialization code must be ran only on the main browser process
-				 * we bail out
-				 **/
-				return exitCode;
-			}
-
-            var settings = CreateSettings();
-            CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
+        
+        public RekoBrowserHost(IChromelyNativeHost nativeHost, IChromelyContainer container, IChromelyConfiguration config, IChromelyCommandTaskRunner commandTaskRunner, CefMessageRouterBrowserSide browserMessageRouter) : base(nativeHost, container, config, commandTaskRunner, browserMessageRouter)
+        {
             CefRuntime.RegisterSchemeHandlerFactory("reko", "", new RekoSchemeHandlerFactory());
-
-            this.browser = (RekoGlueBrowser)CreateBrowserObject();
-			browser.StartUrl = initialUrl;
-
-			browser.Created += Browser_Created;
-			browser.BeforeClose += Browser_BeforeClose;
-
-			var window = CreateWindowInfo();
-			browser.Create(window);
-
-			running = true;
-			while (running) {
-				CefRuntime.DoMessageLoopWork();
-			}
-
-			host!.CloseBrowser(false);
-			CefRuntime.Shutdown();
-            return 0;
-		}
-
-		private void Browser_BeforeClose(object? sender, global::Chromely.CefGlue.Browser.EventParams.BeforeCloseEventArgs e) {
-			this.running = false;
-		}
-
-		/// <summary>
-		/// Saves the host locally as soon as the browser has been created
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void Browser_Created(object? sender, EventArgs e) {
-			var browser = sender as CefGlueBrowser;
-			host = browser!.CefBrowser.GetHost();
         }
-	}
+    }
 }

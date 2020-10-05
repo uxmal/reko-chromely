@@ -25,6 +25,7 @@ using Chromely.CefGlue.Browser;
 using Chromely.Core;
 using Chromely.Core.Configuration;
 using Chromely.Core.Network;
+using Reko.Chromely.BrowserHost.ChromelyExtensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,7 +34,7 @@ using Xilium.CefGlue.Wrapper;
 
 namespace Reko.Chromely.BrowserHost
 {
-    public class RekoGlueBrowser : CefGlueBrowser
+    public class RekoGlueBrowser : ExtensibleGlueBrowser
     {
         private readonly CefClient client;
         private readonly CefBrowserSettings settings;
@@ -58,7 +59,7 @@ namespace Reko.Chromely.BrowserHost
             this.client = CreateClient(container, config, commandTaskRunner, browserMessageRouter);
         }
 
-        public new void Create(CefWindowInfo windowInfo)
+        public override void Create(CefWindowInfo windowInfo)
         {
             settings.DefaultEncoding = "UTF-8";
             settings.FileAccessFromFileUrls = CefState.Enabled;
