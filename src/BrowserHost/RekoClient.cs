@@ -21,7 +21,10 @@
 // THE SOFTWARE.
 #endregion
 
-using Chromely.CefGlue.Browser;
+using Chromely;
+using Chromely.Browser;
+using Chromely.Core;
+using Chromely.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -31,9 +34,9 @@ using Xilium.CefGlue.Wrapper;
 
 namespace Reko.Chromely.BrowserHost
 {
-    public class RekoClient : CefGlueClient
+    public class RekoClient : CefBrowserClient
     {
-        public RekoClient(CefMessageRouterBrowserSide browserMessageRouter, CefGlueCustomHandlers handlers) : base(browserMessageRouter, handlers)
+        public RekoClient(CefMessageRouterBrowserSide browserMessageRouter, ChromelyHandlersResolver handlersResolver) : base(browserMessageRouter, handlersResolver)
         {
         }
 
@@ -49,7 +52,7 @@ namespace Reko.Chromely.BrowserHost
                 return true;
             }
 
-            return false;
+            return base.OnProcessMessageReceived(browser, frame, sourceProcess, message);
         }
     }
 }

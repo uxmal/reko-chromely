@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 #endregion
 
-using Chromely.CefGlue.Browser.Handlers;
 using Reko.Chromely.BrowserHost.Functions;
 using Reko.Chromely.Renderers;
 using Reko.Core;

@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 #endregion
 
-using Chromely.CefGlue.Browser;
 using Chromely.Core.Configuration;
 using System;
 using System.Collections.Generic;
@@ -30,14 +29,9 @@ using Xilium.CefGlue;
 
 namespace Reko.Chromely.BrowserHost
 {
-	public class RekoBrowserApp : CefGlueApp
+	public class RekoBrowserApp : CefApp
 	{
 		private readonly RekoRenderProcessHandler renderProcessHandler = new RekoRenderProcessHandler();
-
-        public RekoBrowserApp(IChromelyConfiguration config) 
-            : base(config)
-        {
-		}
 
 		/// <summary>
 		/// Override that provides our custom <see cref="RekoRenderProcessHandler" />

@@ -21,20 +21,17 @@
 // THE SOFTWARE.
 #endregion
 
-using Caliburn.Light;
-using Chromely.CefGlue.BrowserWindow;
+using Chromely.Core;
 using Chromely.Core.Configuration;
-using Chromely.Core.Defaults;
-using Chromely.Native;
+using Chromely.Core.Host;
 using Reko.Chromely.BrowserHost;
 using System;
 using System.IO;
 using System.Reflection;
-using Xilium.CefGlue.Wrapper;
 
 namespace Reko.Chromely
 {
-	class Program
+    class Program
     {
         private static IChromelyConfiguration CreateConfiguration()
         {
@@ -52,14 +49,13 @@ namespace Reko.Chromely
         static int Main(string[] args)
         {
             var config = CreateConfiguration();
-            var nativeHost = NativeHostFactory.GetNativeHost(config);
-            var container = new SimpleContainer();
-            var requestTaskRunner = new DefaultRequestTaskRunner(container, config);
-            var commandTaskRunner = new DefaultCommandTaskRunner(container);
 
-
-            var appHost = new RekoAppHost(nativeHost, container, config, requestTaskRunner, commandTaskRunner);
-            appHost.Run(args);
+            var app = AppBuilder.Create()
+                .UseApp<RekoApp>()
+                .UseConfig<IChromelyConfiguration>(config)
+                .UseWindow<RekoBrowserHost>()
+                .Build();
+            app.Run(args);
             return 0;
         }
     }
