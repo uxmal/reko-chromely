@@ -40,7 +40,6 @@ namespace Reko.Chromely.Renderers
 
         private void RenderLines(ImageSegment segment, Address address, long offset, long length)
         {
-            var addrLineStart = address.Align(LineSize);
             var sep = "";
             for(long o=offset; o<length; o += LineSize)
             {
@@ -68,26 +67,58 @@ namespace Reko.Chromely.Renderers
             return "d";
         }
 
+        private IEnumerable<string> RenderBytes(ImageSegment segment, long o)
+        {
+            for (int i = 0; i < LineSize; i++)
+            {
+                yield return segment.MemoryArea.Bytes[o + i].ToString("X2");
+            }
+        }
+
         private void RenderLine(ImageSegment segment, Address address, long o)
         {
             sb.AppendLine("{");
             var lineAddr = address + o;
             var lineAddrString = lineAddr.ToString();
-            sb.AppendLine($"\"addr\": \"{lineAddrString}\",");
-            sb.AppendLine($"\"addrLabel\": \"0x{lineAddrString}\",");
-            sb.AppendLine("\"hex\": [");
+
+            RenderKeyValue("addr", lineAddrString, ",");
+            RenderKeyValue("addrLabel", "0x" + lineAddrString, ",");
+            RenderKeyValue("hex", () =>
+            {
+                RenderArray(RenderBytes(segment, o), (b) =>
+                {
+                    sb.Append("{");
+                    RenderKeyValue("t", GetTypeForAddress(lineAddr), ",");
+                    RenderKeyValue("d", b, "");
+                    sb.AppendLine("}");
+                });
+            }, "");
+            sb.Append("}");
+        }
+
+        private void RenderArray(IEnumerable<string> elements, Action<string> elementRenderer)
+        {
             var sep = "";
-            for(int i=0; i<LineSize; i++)
+            sb.AppendLine("[");
+            foreach (var obj in elements)
             {
                 sb.Append(sep);
                 sep = ",";
-                sb.Append("{");
-                sb.AppendFormat("\"t\": \"{0}\",", GetTypeForAddress(lineAddr));
-                sb.AppendFormat("\"d\": \"{0:X2}\"", segment.MemoryArea.Bytes[o + i]);
-                sb.AppendLine("}");
+                elementRenderer(obj);
             }
             sb.AppendLine("]");
-            sb.Append("}");
+        }
+
+        private void RenderKeyValue(string key, Action valueRenderer, string sep)
+        {
+            sb.AppendFormat("\"{0}\": ", key);
+            valueRenderer();
+            sb.Append(sep);
+        }
+
+        private void RenderKeyValue(string key, string value, string sep)
+        {
+            sb.AppendFormat("\"{0}\": \"{1}\"{2}", key, value, sep);
         }
     }
 }

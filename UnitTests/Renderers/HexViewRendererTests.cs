@@ -41,9 +41,7 @@ namespace Reko.Chromely.UnitTests
 			#region expected
 				@"[
 {
-""addr"": ""00001000"",
-""addrLabel"": ""0x00001000"",
-""hex"": [
+""addr"": ""00001000"",""addrLabel"": ""0x00001000"",""hex"": [
 {""t"": ""d"",""d"": ""00""}
 ,{""t"": ""d"",""d"": ""01""}
 ,{""t"": ""d"",""d"": ""02""}
