@@ -17,12 +17,9 @@ namespace Reko.Chromely.BrowserHost
 {
     public class RekoApp : ChromelyBasicApp
     {
-
-        public override void ConfigureCoreServices(ServiceCollection services)
+        public override void ConfigureServices(ServiceCollection services)
         {
-            base.ConfigureCoreServices(services);
-
-            services.RemoveAll<ChromelyWindowController>();
+            base.ConfigureServices(services);
             services.TryAddSingleton<ChromelyWindowController, RekoBrowserHostController>();
         }
     }
