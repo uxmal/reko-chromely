@@ -48,8 +48,13 @@ namespace Reko.Chromely.RekoHosting
 
         public ListenerService(CefV8Context ctx, EventListenersRepository eventListeners)
         {
-            this.ctx = ctx;
             this.eventListeners = eventListeners;
+            SetContext(ctx);
+        }
+
+        public void SetContext(CefV8Context ctx)
+        {
+            this.ctx = ctx;
             RegisterEvents();
         }
 

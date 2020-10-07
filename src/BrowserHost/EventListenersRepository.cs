@@ -58,5 +58,10 @@ namespace Reko.Chromely.BrowserHost
         {
             eventListeners[eventName].Invoke(arguments);
         }
+
+        public void Reset()
+        {
+            eventListeners.Clear();
+        }
     }
 }

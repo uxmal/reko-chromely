@@ -22,6 +22,7 @@
 #endregion
 
 using Reko.Chromely.RekoHosting;
+using Reko.Core;
 using Reko.Core.Configuration;
 using Reko.Core.Services;
 using System;
@@ -36,16 +37,14 @@ namespace Reko.Chromely.BrowserHost
 	/// </summary>
 	public class RekoRenderProcessHandler : CefRenderProcessHandler
 	{
-        private readonly PendingPromisesRepository pendingPromises;
-        private readonly ServiceContainer services;
+        private readonly PendingPromisesRepository pendingPromises = new PendingPromisesRepository();
+        private readonly ServiceContainer services = new ServiceContainer();
         private Decompiler? decompiler;
-        private EventListenersRepository eventListeners;
+        private readonly EventListenersRepository eventListeners = new EventListenersRepository();
 
         public RekoRenderProcessHandler()
         {
             this.services = new ServiceContainer();
-            this.pendingPromises = new PendingPromisesRepository();
-            this.eventListeners = new EventListenersRepository();
         }
 
 		/// <summary>
@@ -56,12 +55,26 @@ namespace Reko.Chromely.BrowserHost
 		/// <param name="context"></param>
 		protected override void OnContextCreated(CefBrowser browser, CefFrame frame, CefV8Context context)
         {
-            CreateRekoInstance(context);
+            if (this.decompiler == null)
+            {
+                decompiler = CreateRekoInstance(context);
+            }
 
-            new RekoBrowserGlobals(pendingPromises, eventListeners, services, this.decompiler!, context).RegisterGlobals();
+            // attach and register events
+            var listener = (ListenerService) services.RequireService<DecompilerEventListener>();
+            listener.SetContext(context);
+
+            new RekoBrowserGlobals(pendingPromises!, eventListeners!, services, this.decompiler!, context).RegisterGlobals();
         }
 
-        private void CreateRekoInstance(CefV8Context context)
+        protected override void OnContextReleased(CefBrowser browser, CefFrame frame, CefV8Context context)
+        {
+            // wipe pending promises and events
+            this.pendingPromises?.Reset();
+            this.eventListeners?.Reset();
+        }
+
+        private Reko.Decompiler CreateRekoInstance(CefV8Context context)
         {
             var fsSvc = new FileSystemServiceImpl();
             var listener = new ListenerService(context, eventListeners);
@@ -75,7 +88,7 @@ namespace Reko.Chromely.BrowserHost
             services.AddService(typeof(IDecompiledFileService), dfSvc);
             services.AddService(typeof(ITypeLibraryLoaderService), new TypeLibraryLoaderServiceImpl(services));
             var loader = new Reko.Loading.Loader(services);
-            this.decompiler = new Reko.Decompiler(loader, services);
+            return new Reko.Decompiler(loader, services);
         }
 
         protected override bool OnProcessMessageReceived(CefBrowser browser, CefFrame frame, CefProcessId sourceProcess, CefProcessMessage message)

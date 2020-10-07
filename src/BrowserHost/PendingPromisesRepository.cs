@@ -49,5 +49,10 @@ namespace Reko.Chromely.BrowserHost
             promises.Remove(promiseId);
             return promise;
         }
+
+        public void Reset()
+        {
+            promises.Clear();
+        }
     }
 }
