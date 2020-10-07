@@ -10,7 +10,10 @@ namespace Reko.Chromely.BrowserHost
     {
         public static void Launch()
         {
-            Debugger.Launch();
+            if (!Debugger.Launch())
+            {
+                return;
+            }
             while (!Debugger.IsAttached) Thread.Sleep(200);
             Debugger.Break();
         }

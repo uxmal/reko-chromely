@@ -41,7 +41,7 @@ namespace Reko.Chromely.Renderers
         private void RenderLines(ImageSegment segment, Address address, long offset, long length)
         {
             var sep = "";
-            for(long o=offset; o<length; o += LineSize)
+            for(long o=offset; o<offset + length; o += LineSize)
             {
                 sb.Append(sep);
                 sep = ",";

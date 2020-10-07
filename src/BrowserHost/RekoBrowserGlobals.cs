@@ -24,6 +24,7 @@
 using Reko.Chromely.BrowserHost.Functions;
 using Reko.Chromely.Renderers;
 using Reko.Core;
+using Reko.Core.NativeInterface;
 using Reko.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -134,12 +135,15 @@ namespace Reko.Chromely.BrowserHost
                 var global = context.GetGlobal();
                 var rekoObj = CefV8Value.CreateObject();
 
+                var dumpBytesFn = new Proto_DumpBytes(decompiler);
+
                 global.SetValue("reko", rekoObj);
                 RegisterAsyncFunction(rekoObj, "OpenFile", new OpenFileHandler(promiseFactory, pendingPromises));
 				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", new Func<string,string,string>(Proto_DisassembleRandomBytes.Execute));
                 RegisterAsyncFunction(rekoObj, "Proto_GeneratePng", new Func<int,byte[]>(Proto_GeneratePng.Execute));
                 RegisterAsyncFunction(rekoObj, "LoadFile", new Func<string, string, bool>(decompiler.Load));
                 RegisterAsyncFunction(rekoObj, "Scan", new Action(decompiler.ScanPrograms));
+                RegisterAsyncFunction(rekoObj, "DumpBytes", new Func<string, string, long, string>(dumpBytesFn.Execute));
                 RegisterFunction(rekoObj, "TestListener", new Action(() =>
                 {
                     var listener = services.RequireService<DecompilerEventListener>();
