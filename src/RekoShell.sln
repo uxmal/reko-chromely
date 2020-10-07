@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RekoShell", "RekoShell.csproj", "{60AAFBF8-D217-47FA-BFD1-2809A3EDFABC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "..\UnitTests\UnitTests.csproj", "{DD19A077-5575-43C2-B77D-0C3EF8741AAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{60AAFBF8-D217-47FA-BFD1-2809A3EDFABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60AAFBF8-D217-47FA-BFD1-2809A3EDFABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60AAFBF8-D217-47FA-BFD1-2809A3EDFABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD19A077-5575-43C2-B77D-0C3EF8741AAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD19A077-5575-43C2-B77D-0C3EF8741AAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD19A077-5575-43C2-B77D-0C3EF8741AAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD19A077-5575-43C2-B77D-0C3EF8741AAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
