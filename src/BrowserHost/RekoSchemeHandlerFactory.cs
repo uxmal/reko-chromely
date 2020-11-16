@@ -79,6 +79,12 @@ namespace Reko.Chromely.BrowserHost
                 bytesRead = Math.Min(bytesToRead, blob.Length - offset);
                 System.Runtime.InteropServices.Marshal.Copy(this.blob, this.offset, dataOut, bytesRead);
                 offset += bytesRead;
+
+                if (bytesRead == 0)
+                {
+                    return false;
+                }
+
                 return true;
             }
 
