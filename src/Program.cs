@@ -39,7 +39,8 @@ namespace Reko.Chromely
 
             // Obtain the html url relative to the executing assembly
             var baseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-            var initialUrl = Path.Combine(baseDirectory!, "app", "index.html");
+            //var initialUrl = Path.Combine(baseDirectory!, "app", "index.html");
+            var initialUrl = "http://127.0.0.1:3000";
 
             config.StartUrl = initialUrl;
             return config;

@@ -9,8 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="app\reko\**" />
+    <EmbeddedResource Remove="app\reko\**" />
     <None Remove="app\Content\ts\*.js" />
     <None Remove="app\Content\ts\*.js.map" />
+    <None Remove="app\reko\**" />
+    <TypeScriptCompile Remove="app\reko\**" />
   </ItemGroup>
 
   <ItemGroup>
