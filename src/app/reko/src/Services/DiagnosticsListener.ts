@@ -5,7 +5,7 @@ export type DiagnosticsListenerProps = {
 }
 
 export class DiagnosticsListener {
-	constructor(private readonly props:DiagnosticsListenerProps){
-		window.reko.RegisterEventListener("Listener.Info", this.props.onMessage);
+	public static register(sink:string, onMessage: (msg:string) => void){
+		window.reko.RegisterEventListener("Listener.Info", onMessage);
 	}
 }

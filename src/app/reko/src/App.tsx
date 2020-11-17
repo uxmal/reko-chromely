@@ -36,10 +36,7 @@ class App extends React.Component<{},AppState> {
 	}
 
 	componentDidMount(){
-		new DiagnosticsListener({
-			onMessage: this.onDiagnosticMessage.bind(this)
-		});
-		
+		DiagnosticsListener.register("Listener.Info", this.onDiagnosticMessage.bind(this));
 		let awindow = window as any;
 		awindow.reko.TestListener();
 	}

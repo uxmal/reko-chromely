@@ -33,6 +33,42 @@ using Xilium.CefGlue;
 
 namespace Reko.Chromely.RekoHosting
 {
+
+    public abstract class MessageListenerSink
+    {
+        public const string EV_ERROR = "Listener.Error";
+        public const string EV_INFO = "Listener.Info";
+        public const string EV_WARN = "Listener.Warn";
+    }
+
+    internal class PostMessageTask : CefTask
+    {
+        private readonly EventListenersRepository eventListeners;
+        private readonly string sinkName;
+
+        private readonly CefV8Context ctx;
+        private readonly string message;
+
+        public PostMessageTask(CefV8Context ctx, EventListenersRepository eventListeners, string sinkName, string message)
+        {
+            this.ctx = ctx;
+            this.eventListeners = eventListeners;
+            this.sinkName = sinkName;
+            this.message = message;
+        }
+
+        protected override void Execute()
+        {
+            ctx.Acquire(() =>
+            {
+                eventListeners.Invoke(sinkName, new CefV8Value[]
+                {
+                    CefV8Value.CreateString(message)
+                });
+            });
+        }
+    }
+
     //$TODO: this needs to call back to JavaScript to show diagnostics. We want to call back to JavaScript, somehow obtaining
     // a reference to the current context. Or rather, get the runner and push a task on it. right?
     public class ListenerService : DecompilerEventListener
@@ -41,10 +77,6 @@ namespace Reko.Chromely.RekoHosting
         private CefV8Context ctx;
 
         private readonly EventListenersRepository eventListeners;
-
-        private const string EV_ERROR = "Listener.Error";
-        private const string EV_INFO = "Listener.Info";
-        private const string EV_WARN = "Listener.Warn";
 
         public ListenerService(CefV8Context ctx, EventListenersRepository eventListeners)
         {
@@ -61,9 +93,9 @@ namespace Reko.Chromely.RekoHosting
 
         private void RegisterEvents()
         {
-            eventListeners.RegisterEvent(EV_ERROR);
-            eventListeners.RegisterEvent(EV_INFO);
-            eventListeners.RegisterEvent(EV_WARN);
+            eventListeners.RegisterEvent(MessageListenerSink.EV_ERROR);
+            eventListeners.RegisterEvent(MessageListenerSink.EV_INFO);
+            eventListeners.RegisterEvent(MessageListenerSink.EV_WARN);
         }
 
         public void Cancel()
@@ -128,13 +160,9 @@ namespace Reko.Chromely.RekoHosting
 
         public void Error(ICodeLocation location, string message)
         {
-            ctx.Acquire(() =>
-            {
-                eventListeners.Invoke(EV_ERROR, new CefV8Value[]
-                {
-                    CefV8Value.CreateString($"<div class='diag-err'><div>NYI</div><div>{message}</div></div>")
-                });
-            });
+            ctx.GetTaskRunner().PostTask(new PostMessageTask(
+                ctx, eventListeners,
+                MessageListenerSink.EV_ERROR, $"<div class='diag-err'><div>NYI</div><div>{message}</div></div>"));
         }
 
         public void Error(ICodeLocation location, string message, params object[] args)
@@ -164,14 +192,9 @@ namespace Reko.Chromely.RekoHosting
 
         public void Info(ICodeLocation location, string message)
         {
-            ctx.Acquire(() =>
-            {
-                var s = $"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>";
-                eventListeners.Invoke(EV_INFO, new CefV8Value[]
-                {
-                    CefV8Value.CreateString(s)
-                });
-            });
+            ctx.GetTaskRunner().PostTask(new PostMessageTask(
+                ctx, eventListeners,
+                MessageListenerSink.EV_INFO, $"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>"));
         }
 
         public void Info(ICodeLocation location, string message, params object[] args)
@@ -207,13 +230,9 @@ namespace Reko.Chromely.RekoHosting
 
         public void Warn(ICodeLocation location, string message)
         {
-            ctx.Acquire(() =>
-            {
-                eventListeners.Invoke(EV_WARN, new CefV8Value[]
-                {
-                    CefV8Value.CreateString($"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>")
-                });
-            });
+            ctx.GetTaskRunner().PostTask(new PostMessageTask(
+                ctx, eventListeners,
+                MessageListenerSink.EV_WARN, $"<div class='diag-warn'><div>NYI</div><div>{message}</div></div>"));
         }
 
         public void Warn(ICodeLocation location, string message, params object[] args)
