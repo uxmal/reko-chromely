@@ -8,6 +8,10 @@
     <RootNamespace>Reko.Chromely</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>REACT_DEVEL</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="app\reko\**" />
     <EmbeddedResource Remove="app\reko\**" />

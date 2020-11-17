@@ -1,4 +1,4 @@
-﻿#region
+﻿#region License
 // Copyright 2020 the Reko contributors.
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy 

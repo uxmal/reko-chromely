@@ -1,4 +1,4 @@
-﻿#region
+﻿#region License
 // Copyright 2020 the Reko contributors.
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy 
@@ -39,9 +39,17 @@ namespace Reko.Chromely
 
             // Obtain the html url relative to the executing assembly
             var baseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-            //var initialUrl = Path.Combine(baseDirectory!, "app", "index.html");
+#if LEGACY_UI        
+            // app/index.html (legacy)
+            var initialUrl = Path.Combine(baseDirectory!, "app", "index.html");
+#elif REACT_DEVEL
+            // react development server, serving up the content from app/reko/build/index.html
+            // This requires you to start the server with 'yarn start' in app/reko (react project root).
             var initialUrl = "http://127.0.0.1:3000";
-
+#else
+            // app/reko/build/index.html (output of "yarn build")
+            var initialUrl = Path.Combine(baseDirectory!, "app", "reko", "build", "index.html");
+#endif
             config.StartUrl = initialUrl;
             return config;
         }
