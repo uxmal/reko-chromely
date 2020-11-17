@@ -118,7 +118,7 @@ class App extends React.Component<{},AppState> {
 
 				<br />
 				<ImageMapComponent />
-				<table className="mainView">
+				<table className="mainView"><tbody>
 				<tr>
 					<td id="projectBrowser">
 						<ToolWindowFrame title="Project browser">
@@ -139,7 +139,7 @@ class App extends React.Component<{},AppState> {
 					</td>
 				</tr>
 
-				</table>
+				</tbody></table>
 
 				<DocumentWindowFrame title="Diagnostics">
 					<DiagnosticsArea>{this.state.diagnosticMessages}</DiagnosticsArea>

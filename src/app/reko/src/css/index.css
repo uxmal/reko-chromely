@@ -24,7 +24,7 @@
     width: 100%
 }
 
-.mainView > tr > td { vertical-align: top }
+.mainView > tbody > tr > td { vertical-align: top }
 
 #projectBrowser {
     width: 300px
