@@ -22,6 +22,7 @@
 #endregion
 
 using Reko.Core;
+using Reko.Core.Memory;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -92,7 +93,7 @@ namespace Reko.Chromely.Renderers
 
         private IEnumerable<string> RenderBytes(ImageSegment segment, long oAligned, long o)
         {
-            var bytes = segment.MemoryArea.Bytes;
+            var bytes = ((ByteMemoryArea)segment.MemoryArea).Bytes;
             for (int i = 0; i < LineSize; i++)
             {
                 string sMemUnit = (o <= i + oAligned && oAligned + i < bytes.Length)

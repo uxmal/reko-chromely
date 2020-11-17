@@ -105,6 +105,26 @@ namespace Reko.Chromely.RekoHosting
             return new JsLocation(@$"{{""program"":""{program.Name}"",""stmLoc"":""{stm.LinearAddress}""}}");
         }
 
+        public void Error(string message)
+        {
+            Error(new NullCodeLocation(""), message);
+        }
+
+        public void Error(string format, params object[] args)
+        {
+            Error(new NullCodeLocation(""), string.Format(format, args));
+        }
+
+        public void Error(Exception ex, string message)
+        {
+            Error(new NullCodeLocation(""), ex, message);
+        }
+
+        public void Error(Exception ex, string format, params object[] args)
+        {
+            Error(new NullCodeLocation(""), ex, string.Format(format, args));
+        }
+
         public void Error(ICodeLocation location, string message)
         {
             ctx.Acquire(() =>
@@ -131,13 +151,24 @@ namespace Reko.Chromely.RekoHosting
             Error(location, ex, string.Format(message, args));
         }
 
+        public void Info(string message)
+        {
+            Info(new NullCodeLocation(""), message);
+        }
+
+        public void Info(string format, params object[] args)
+        {
+            Info(new NullCodeLocation(""), string.Format(format, args));
+        }
+
         public void Info(ICodeLocation location, string message)
         {
             ctx.Acquire(() =>
             {
+                var s = $"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>";
                 eventListeners.Invoke(EV_INFO, new CefV8Value[]
                 {
-                    CefV8Value.CreateString($"<div class='diag-inf'><div>NYI</div><div>{message}</div></div>")
+                    CefV8Value.CreateString(s)
                 });
             });
         }
@@ -160,6 +191,17 @@ namespace Reko.Chromely.RekoHosting
         public void ShowStatus(string caption)
         {
             //JavaScript.ExecuteScript($"diagnostics.status({Quote(caption)})");
+        }
+
+
+        public void Warn(string message)
+        {
+            Error(new NullCodeLocation(""), message);
+        }
+
+        public void Warn(string format, params object[] args)
+        {
+            Error(new NullCodeLocation(""), string.Format(format, args));
         }
 
         public void Warn(ICodeLocation location, string message)

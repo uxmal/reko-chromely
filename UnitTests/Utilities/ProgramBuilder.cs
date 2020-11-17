@@ -1,6 +1,7 @@
 ﻿using Reko.Core;
 using Reko.Core.Code;
 using Reko.Core.Expressions;
+using Reko.Core.Memory;
 using Reko.Core.Serialization;
 using Reko.Core.Types;
 using System;
@@ -32,7 +33,7 @@ namespace Reko.Chromely.UnitTests.Utilities
             };
         }
 
-        public ProgramBuilder(MemoryArea mem)
+        public ProgramBuilder(ByteMemoryArea mem)
         {
             Program = new Program
             {
@@ -144,7 +145,7 @@ namespace Reko.Chromely.UnitTests.Utilities
             if (Program.SegmentMap == null)
                 Program.SegmentMap = new SegmentMap(Address.Ptr16(0x1000));
             Program.SegmentMap.AddSegment(
-                new MemoryArea(Address.Ptr32(0x1000), new byte[Program.Procedures.Count * 0x1000]),
+                new ByteMemoryArea(Address.Ptr32(0x1000), new byte[Program.Procedures.Count * 0x1000]),
                 ".text", AccessMode.Execute);
 
             Program.Platform = new DefaultPlatform(null, arch);

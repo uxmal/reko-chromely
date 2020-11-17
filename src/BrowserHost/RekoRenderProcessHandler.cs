@@ -78,13 +78,11 @@ namespace Reko.Chromely.BrowserHost
         {
             var fsSvc = new FileSystemServiceImpl();
             var listener = new ListenerService(context, eventListeners);
-            var diagSvc = new DiagnosticsService(listener, context);
-            var dfSvc = new DecompiledFileService(fsSvc);
+            var dfSvc = new DecompiledFileService(fsSvc, listener);
             services.AddService(typeof(IFileSystemService), fsSvc);
             services.AddService(typeof(DecompilerEventListener), listener);
             var configSvc = RekoConfigurationService.Load(services, "reko/reko.config");
             services.AddService(typeof(IConfigurationService), configSvc);
-            services.AddService(typeof(IDiagnosticsService), diagSvc);
             services.AddService(typeof(IDecompiledFileService), dfSvc);
             services.AddService(typeof(ITypeLibraryLoaderService), new TypeLibraryLoaderServiceImpl(services));
             var loader = new Reko.Loading.Loader(services);

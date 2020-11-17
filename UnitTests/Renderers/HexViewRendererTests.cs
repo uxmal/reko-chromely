@@ -3,6 +3,7 @@ using Reko.Core;
 using System;
 using System.Linq;
 using Reko.Chromely.Renderers;
+using Reko.Core.Memory;
 
 namespace Reko.Chromely.UnitTests
 {
@@ -16,7 +17,7 @@ namespace Reko.Chromely.UnitTests
 		}
 
 		private void Given_Data(uint uAddress, byte[] bytes) {
-			var mem = new MemoryArea(Address.Ptr32(uAddress), bytes);
+			var mem = new ByteMemoryArea(Address.Ptr32(uAddress), bytes);
 			var seg = new ImageSegment("dummy", mem, AccessMode.ReadWriteExecute);
 			var map = new SegmentMap(mem.BaseAddress, seg);
 			this.program.SegmentMap = map;
