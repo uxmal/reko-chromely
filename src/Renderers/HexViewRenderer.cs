@@ -51,7 +51,7 @@ namespace Reko.Chromely.Renderers
         public string Render()
         {
             sb.AppendLine("[");
-            if(program.SegmentMap.TryFindSegment(address, out var segment))
+            if (program.SegmentMap.TryFindSegment(address, out var segment))
             {
                 var offset = address - segment.MemoryArea.BaseAddress;
                 var length = Math.Min(this.length, segment.MemoryArea.Length - offset);

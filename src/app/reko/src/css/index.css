@@ -20,3 +20,13 @@
     padding: 3px;
 }
 
+.mainView {
+    width: 100%
+}
+
+.mainView > tr > td { vertical-align: top }
+
+#projectBrowser {
+    width: 300px
+}
+

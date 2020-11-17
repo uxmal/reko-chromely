@@ -5,7 +5,8 @@ import { RekoMenu } from './Components/RekoMenu';
 import { RekoDisassemblyView } from './Components/RekoDisassemblyView';
 import { DiagnosticsArea } from './Components/DiagnosticsArea';
 import { ImageMapComponent } from './Components/ImageMapComponent';
-
+import { DocumentWindowFrame } from './Components/DocumentWindowFrame';
+import { ToolWindowFrame } from './Components/ToolWindowFrame';
 
 import './css/index.css';
 import './css/reko.css';
@@ -54,6 +55,7 @@ class App extends React.Component<{},AppState> {
 		});
 	}
 
+	// User asked to disassemble some instructions.
 	private async onDisassembleBytes(){
 		let content = await window.reko.Proto_DisassembleRandomBytes("0010000", "00010");
 		this.setState({
@@ -89,9 +91,7 @@ class App extends React.Component<{},AppState> {
 			projectViewContent: projectViewContent
 		});
 
-
-
-		console.log("OK");
+		console.log("File loaded.");
 	}
 
 	private static basename(str:string):string {
@@ -113,18 +113,34 @@ class App extends React.Component<{},AppState> {
 
 				<br />
 				<ImageMapComponent />
+				<table className="mainView">
+				<tr>
+					<td id="projectBrowser">
+						<ToolWindowFrame title="Project browser">
+							<ProjectView content={this.state.projectViewContent} />
+						</ToolWindowFrame>
+					</td>
+					<td className="documentArea">
+						<DocumentWindowFrame title="Memory">
+							<BytesDumpView
+								programName={App.basename(this.state.filePath ?? "")}
+								length={16}
+							/>
+						</DocumentWindowFrame>
 
-				<RekoDisassemblyView content={this.state.dasmContent} />
-				<ProjectView content={this.state.projectViewContent} />
+						<DocumentWindowFrame title="Disassembly">
+							<RekoDisassemblyView content={this.state.dasmContent} />
+						</DocumentWindowFrame>
+				</td>
+				</tr>
 
-				<BytesDumpView
-					programName={App.basename(this.state.filePath ?? "")}
-					length={16}
-				/>
+				</table>
 
+				<DocumentWindowFrame title="Diagnostics">
 				<DiagnosticsArea>
 					{this.state.diagnosticMessages}
 				</DiagnosticsArea>
+				</DocumentWindowFrame>
 		</div>
 	}
 }
