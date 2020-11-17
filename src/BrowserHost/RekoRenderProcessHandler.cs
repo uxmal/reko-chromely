@@ -25,7 +25,6 @@ using Reko.Chromely.RekoHosting;
 using Reko.Core;
 using Reko.Core.Configuration;
 using Reko.Core.Services;
-using Reko.Gui;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
