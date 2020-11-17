@@ -65,3 +65,15 @@
 }
 .reko-dasm .addr {
 }
+
+.memoryView .addr {
+    text-decoration-line: underline
+}
+
+.memoryView .items {
+    display: inline-block;
+}
+.memoryView .items > span
+{
+    padding-left: 3px; padding-right: 3px;
+}

@@ -54,15 +54,15 @@ export class BytesDumpView extends React.Component<BytesDumpViewProps,BytesDumpV
 				return <span key={i}>{b.d}</span>;
 			});
 
-			return <div key={r.addr}>
-				<span>{r.addrLabel}</span>
-				<div>
+			return <div className='memRow' key={r.addr}>
+				<span className='addr'>{r.addrLabel}</span>
+				<div className='items'>
 					{items}
 				</div>
 			</div>;
 		});
 
-		let outer = <div>
+		let outer = <div className="memoryView">
 			<input type="text" onChange={this.onDumpAddressChange.bind(this)}></input>
 			{rows}
 		</div>;
