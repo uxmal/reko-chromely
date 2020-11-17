@@ -65,5 +65,42 @@ namespace Reko.Chromely.UnitTests
 
 			AssertEqual(sExp, sActual);
 		}
+
+		[Test]
+		public void Hv_SingleLine_Misaligned()
+		{
+			Given_Program();
+			Given_Data(0x1000, Enumerable.Range(0, 16).Select(i => (byte)i).ToArray());
+			var hr = new HexViewRenderer(program, program.SegmentMap.BaseAddress + 1, 16);
+			var sActual = hr.Render();
+
+			var sExp =
+			#region expected
+				@"[
+{
+""addr"": ""00001001"",""addrLabel"": ""0x00001001"",""hex"": [
+{""t"": ""d"",""d"": """"}
+,{""t"": ""d"",""d"": ""01""}
+,{""t"": ""d"",""d"": ""02""}
+,{""t"": ""d"",""d"": ""03""}
+,{""t"": ""d"",""d"": ""04""}
+,{""t"": ""d"",""d"": ""05""}
+,{""t"": ""d"",""d"": ""06""}
+,{""t"": ""d"",""d"": ""07""}
+,{""t"": ""d"",""d"": ""08""}
+,{""t"": ""d"",""d"": ""09""}
+,{""t"": ""d"",""d"": ""0A""}
+,{""t"": ""d"",""d"": ""0B""}
+,{""t"": ""d"",""d"": ""0C""}
+,{""t"": ""d"",""d"": ""0D""}
+,{""t"": ""d"",""d"": ""0E""}
+,{""t"": ""d"",""d"": ""0F""}
+]
+}]
+";
+			#endregion
+
+			AssertEqual(sExp, sActual);
+		}
 	}
 }

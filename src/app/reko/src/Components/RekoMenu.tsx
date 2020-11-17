@@ -4,7 +4,8 @@ export type RekoMenuProps = {
 	onDisassembleBytes: () => void,
 	onClearDasm: () => void,
 	onOpenFile: () => void,
-	onLoadImage: () => void
+	onLoadImage: () => void,
+	onScanImage: () => void
 }
 
 export type MenuItemProps = {
@@ -42,6 +43,7 @@ export class RekoMenu extends React.Component<RekoMenuProps,{}>{
 			<button type="button" onClick={this.props.onLoadImage.bind(this)}>Load Image</button>
 			<button type="button" onClick={this.props.onDisassembleBytes.bind(this)}>Disassemble some random X86 code</button>
 			<button type="button" onClick={this.props.onClearDasm.bind(this)}>Clear disassembly</button>
+			<button type="button" onClick={this.props.onScanImage.bind(this)}>Scan Image(s)</button>
 		</div>
 	}
 }

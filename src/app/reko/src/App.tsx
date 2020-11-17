@@ -94,6 +94,10 @@ class App extends React.Component<{},AppState> {
 		console.log("File loaded.");
 	}
 
+	private async onScanImage() {
+		await window.reko.Scan();
+	}
+
 	private static basename(str:string):string {
 		let normalized = str.replace(/\\/g, "/");
 		let base = new String(normalized).substring(normalized.lastIndexOf('/') + 1);
@@ -107,6 +111,7 @@ class App extends React.Component<{},AppState> {
 					onLoadImage={this.onLoadImage.bind(this)}
 					onDisassembleBytes={this.onDisassembleBytes.bind(this)}
 					onClearDasm={this.onClearDasm.bind(this)}
+					onScanImage={this.onScanImage.bind(this)}
 				/>
 
 				<span>Current File: {this.state.filePath}</span>
@@ -131,15 +136,13 @@ class App extends React.Component<{},AppState> {
 						<DocumentWindowFrame title="Disassembly">
 							<RekoDisassemblyView content={this.state.dasmContent} />
 						</DocumentWindowFrame>
-				</td>
+					</td>
 				</tr>
 
 				</table>
 
 				<DocumentWindowFrame title="Diagnostics">
-				<DiagnosticsArea>
-					{this.state.diagnosticMessages}
-				</DiagnosticsArea>
+					<DiagnosticsArea>{this.state.diagnosticMessages}</DiagnosticsArea>
 				</DocumentWindowFrame>
 		</div>
 	}

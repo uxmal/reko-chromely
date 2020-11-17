@@ -68,5 +68,4 @@ namespace Reko.Chromely
             return 0;
         }
     }
-
 }

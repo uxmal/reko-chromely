@@ -30,7 +30,8 @@
 }
 
 .hoverable:hover {
-    background-color: #802D2D
+    background-color: #802D2D;
+    cursor: pointer; 
 }
 
 #projectWindow {
@@ -63,17 +64,26 @@
 #projectPane .segment .addr {
     display: inline-block;
 }
-.reko-dasm .addr {
-}
 
-.memoryView .addr {
+.memoryView .addr:hover {
     text-decoration-line: underline
 }
 
 .memoryView .items {
     display: inline-block;
 }
+
 .memoryView .items > span
 {
+    display:inline-block;
     padding-left: 3px; padding-right: 3px;
+    width:1.2em;
+
+}
+
+.memoryView .items > span:hover
+{
+    background-color: #802D2D;
+    cursor: pointer;
+
 }

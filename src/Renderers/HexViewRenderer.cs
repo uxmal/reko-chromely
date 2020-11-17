@@ -64,7 +64,7 @@ namespace Reko.Chromely.Renderers
         private void RenderLines(ImageSegment segment, Address address, long offset, long length)
         {
             var sep = "";
-            for(long o=offset; o<offset + length; o += LineSize)
+            for (long o=offset; o<offset + length; o += LineSize)
             {
                 sb.Append(sep);
                 sep = ",";
@@ -74,13 +74,13 @@ namespace Reko.Chromely.Renderers
 
         private string GetTypeForAddress(Address address)
         {
-            if(!program.ImageMap.TryFindItem(address, out var item))
+            if (!program.ImageMap.TryFindItem(address, out var item))
             {
                 // undefined
                 return "u";
             }
 
-            if(item is ImageMapBlock)
+            if (item is ImageMapBlock)
             {
                 // code
                 return "c";
@@ -90,28 +90,33 @@ namespace Reko.Chromely.Renderers
             return "d";
         }
 
-        private IEnumerable<string> RenderBytes(ImageSegment segment, long o)
+        private IEnumerable<string> RenderBytes(ImageSegment segment, long oAligned, long o)
         {
+            var bytes = segment.MemoryArea.Bytes;
             for (int i = 0; i < LineSize; i++)
             {
-                yield return segment.MemoryArea.Bytes[o + i].ToString("X2");
+                string sMemUnit = (o <= i + oAligned && oAligned + i < bytes.Length)
+                    ? bytes[oAligned + i].ToString("X2")
+                    : "";
+                yield return sMemUnit;
             }
         }
 
         private void RenderLine(ImageSegment segment, Address address, long o)
         {
             sb.AppendLine("{");
-            var lineAddr = address + o;
+            var lineAddr = address;
             var lineAddrString = lineAddr.ToString();
 
             RenderKeyValue("addr", lineAddrString, ",");
             RenderKeyValue("addrLabel", "0x" + lineAddrString, ",");
             RenderKeyValue("hex", () =>
             {
-                RenderArray(RenderBytes(segment, o), (b) =>
+                var offsetAligned = (o / LineSize) * LineSize; 
+                RenderArray(RenderBytes(segment, offsetAligned, o), (b) =>
                 {
                     sb.Append("{");
-                    RenderKeyValue("t", GetTypeForAddress(lineAddr), ",");
+                    RenderKeyValue("t", GetTypeForAddress(address), ",");
                     RenderKeyValue("d", b, "");
                     sb.AppendLine("}");
                 });

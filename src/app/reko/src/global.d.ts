@@ -3,8 +3,9 @@ interface DisassembleRandomBytesInterface { (address: string, otherArg: string) 
 interface OpenFileInterface { (): string }
 interface LoadFileInterface { (filePath: string, loader: string? = null) : boolean; }
 interface RenderProjectViewInterface { (): string }
+interface ScanImagesInterface { ():any }
 // $TODO: should return a JSON Array
-interface DumpBytesInterface { (programName: string, address: stsring, length: number): string }
+interface DumpBytesInterface { (programName: string, address: string, length: number): string }
 
 type RekoObject = {
 	RegisterEventListener: RegisterEventListenerInterface,
@@ -12,7 +13,8 @@ type RekoObject = {
 	OpenFile: OpenFileInterface,
 	LoadFile: LoadFileInterface,
 	RenderProjectView: RenderProjectViewInterface,
-	DumpBytes: DumpBytesInterface
+	DumpBytes: DumpBytesInterface,
+	Scan: ScanImagesInterface
 }
 
 interface Window {
