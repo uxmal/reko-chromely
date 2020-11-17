@@ -273,5 +273,44 @@ namespace Reko.Chromely.RekoHosting
             return sb.ToString();
         }
 
+        public void Info(string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Info(string message, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Warn(string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Warn(string message, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Error(string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Error(string message, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Error(Exception ex, string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Error(Exception ex, string message, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
