@@ -1,0 +1,67 @@
+﻿body {
+    background-color:#2D2D30;
+    color:#DDDDDD;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.toolWindow {
+    border: solid 1px #CCCCCC;
+}
+
+.toolWindow .caption {
+    background-color: #404080;
+    color: #E0E0E0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 8pt;
+    padding:2px;
+}
+
+.reko-dasm {
+    border: solid 1px #CCCCCC;
+    padding: 3px;
+}
+
+.reko-dasm .mnem {
+    font-weight:bold;
+    padding-right:0.5em;
+    display:inline-block;
+    width:7em;
+}
+
+.hoverable:hover {
+    background-color: #802D2D
+}
+
+#projectWindow {
+    width:300px;
+    min-height:300px;
+    float:left; /* todo: dockable windows */
+    clear:left;
+    border-bottom: solid 1px #CCCCCC
+}
+
+#projectPane {
+    padding: 3px;
+}
+
+#projectPane .program {
+    padding-left: 16px
+}
+
+
+#projectPane .segment {
+    padding-left: 16px
+}
+
+
+#projectPane .segment .name {
+    display:inline-block;
+    width:9em;
+}
+
+#projectPane .segment .addr {
+    display: inline-block;
+}
+.reko-dasm .addr {
+}

@@ -6,7 +6,10 @@ import { RekoDisassemblyView } from './Components/RekoDisassemblyView';
 import { DiagnosticsArea } from './Components/DiagnosticsArea';
 import { ImageMapComponent } from './Components/ImageMapComponent';
 
-import './style.css';
+
+import './css/index.css';
+import './css/reko.css';
+
 import { ProjectView } from './Components/ProjectView';
 import { BytesDumpView } from './Components/BytesDumpView';
 

@@ -7,6 +7,30 @@ export type RekoMenuProps = {
 	onLoadImage: () => void
 }
 
+export type MenuItemProps = {
+	id: number,
+	text: string,
+	icon: string,
+}
+
+export type MenuItemState = {
+	enabled: boolean,
+	visible: boolean
+}
+
+export class MenuItem extends React.Component<MenuItemProps,MenuItemState>{
+
+	constructor(props:MenuItemProps){
+		super(props);
+	}
+
+	render(){
+		return <div>
+			{this.props.children}
+		</div>;
+	}
+}
+
 export class RekoMenu extends React.Component<RekoMenuProps,{}>{
 	constructor(props:RekoMenuProps){
 		super(props);

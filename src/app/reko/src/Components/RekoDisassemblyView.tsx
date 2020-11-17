@@ -13,6 +13,6 @@ export class RekoDisassemblyView extends React.Component<RekoDisassemblyViewProp
 	}
 
 	render(){
-		return <div dangerouslySetInnerHTML={{ __html: this.props.content}}></div>
+		return <div className="reko-dasm" dangerouslySetInnerHTML={{ __html: this.props.content}}></div>
 	}
 }
