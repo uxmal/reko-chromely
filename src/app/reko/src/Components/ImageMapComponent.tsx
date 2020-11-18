@@ -1,9 +1,6 @@
 import React from "react";
 
 export class ImageMapComponent extends React.Component<{},{}>{
-	constructor(props:any){
-		super(props);
-	}
 
 	render(){
 		return <>

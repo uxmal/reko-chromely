@@ -1,3 +1,4 @@
+// TS Definitions for the public methods exposed by the "back end".
 interface RegisterEventListenerInterface { (eventName: string, eventHandler: Function) }
 interface DisassembleRandomBytesInterface { (address: string, otherArg: string) }
 interface OpenFileInterface { (): string }
@@ -6,6 +7,7 @@ interface RenderProjectViewInterface { (): string }
 interface ScanImagesInterface { ():any }
 // $TODO: should return a JSON Array
 interface DumpBytesInterface { (programName: string, address: string, length: number): string }
+interface GetProcedureListInterface { (filter:string):any}
 
 type RekoObject = {
 	RegisterEventListener: RegisterEventListenerInterface,
@@ -14,7 +16,8 @@ type RekoObject = {
 	LoadFile: LoadFileInterface,
 	RenderProjectView: RenderProjectViewInterface,
 	DumpBytes: DumpBytesInterface,
-	Scan: ScanImagesInterface
+	Scan: ScanImagesInterface,
+	GetProcedureList: GetProcedureListInterface,
 }
 
 interface Window {

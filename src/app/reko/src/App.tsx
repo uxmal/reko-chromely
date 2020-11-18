@@ -1,11 +1,12 @@
 import React from 'react';
 import { DiagnosticsListener } from './Services/DiagnosticsListener';
 import { DiagnosticMessage } from './Components/DiagnosticMessage';
+import { DocumentWindowFrame } from './Components/DocumentWindowFrame';
 import { RekoMenu } from './Components/RekoMenu';
 import { RekoDisassemblyView } from './Components/RekoDisassemblyView';
 import { DiagnosticsArea } from './Components/DiagnosticsArea';
 import { ImageMapComponent } from './Components/ImageMapComponent';
-import { DocumentWindowFrame } from './Components/DocumentWindowFrame';
+import { ProcedureList } from './Components/ProcedureList';
 import { ToolWindowFrame } from './Components/ToolWindowFrame';
 
 import './css/index.css';
@@ -120,6 +121,11 @@ class App extends React.Component<{},AppState> {
 					<td id="projectBrowser">
 						<ToolWindowFrame title="Project browser">
 							<ProjectView content={this.state.projectViewContent} />
+						</ToolWindowFrame>
+					</td>
+					<td id="procedureList">
+						<ToolWindowFrame title="Procedure List">
+							<ProcedureList />
 						</ToolWindowFrame>
 					</td>
 					<td className="documentArea">

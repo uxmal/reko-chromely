@@ -136,6 +136,7 @@ namespace Reko.Chromely.BrowserHost
                 var rekoObj = CefV8Value.CreateObject();
 
                 var dumpBytesFn = new Proto_DumpBytes(decompiler);
+                var procListRenderer = new ProcedureListRenderer(decompiler);
 
                 global.SetValue("reko", rekoObj);
                 RegisterAsyncFunction(rekoObj, "OpenFile", new OpenFileHandler(promiseFactory, pendingPromises));
@@ -144,6 +145,7 @@ namespace Reko.Chromely.BrowserHost
                 RegisterAsyncFunction(rekoObj, "LoadFile", new Func<string, string, bool>(decompiler.Load));
                 RegisterAsyncFunction(rekoObj, "Scan", new Action(decompiler.ScanPrograms));
                 RegisterAsyncFunction(rekoObj, "DumpBytes", new Func<string, string, long, string>(dumpBytesFn.Execute));
+                RegisterAsyncFunction(rekoObj, "GetProcedureList", new Func<string, string>(procListRenderer.Render));
                 RegisterFunction(rekoObj, "TestListener", new Action(() =>
                 {
                     var listener = services.RequireService<DecompilerEventListener>();
