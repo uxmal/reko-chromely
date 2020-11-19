@@ -20,7 +20,8 @@ type AppState = {
 	dasmContent: string,
 	projectViewContent: string,
 	filePath: string|null,
-	loaded: boolean
+	loaded: boolean,
+	scanned: boolean
 };
 
 class App extends React.Component<{},AppState> {
@@ -32,7 +33,8 @@ class App extends React.Component<{},AppState> {
 			dasmContent: "",
 			projectViewContent: "",
 			filePath: null,
-			loaded: false
+			loaded: false,
+			scanned: false
 		};
 	}
 
@@ -75,6 +77,11 @@ class App extends React.Component<{},AppState> {
 	}
 
 	private async onLoadImage(){
+		this.setState({
+			loaded: false,
+			scanned: false
+		});
+
 		if(this.state.filePath == null){
 			return;
 		}
@@ -86,14 +93,24 @@ class App extends React.Component<{},AppState> {
 		
 		let projectViewContent = await window.reko.RenderProjectView();
 		this.setState({
-			projectViewContent: projectViewContent
+			projectViewContent: projectViewContent,
+			loaded: true
 		});
 
 		console.log("File loaded.");
 	}
 
 	private async onScanImage() {
+		if(!this.state.loaded){
+			return;
+		}
+
+		console.log("Scanning...");
 		await window.reko.Scan();
+		console.log("Scanning...Done");
+		this.setState({
+			scanned: true
+		});
 	}
 
 	private static basename(str:string):string {
@@ -125,7 +142,7 @@ class App extends React.Component<{},AppState> {
 					</td>
 					<td id="procedureList">
 						<ToolWindowFrame title="Procedure List">
-							<ProcedureList />
+							<ProcedureList scanned={this.state.scanned} />
 						</ToolWindowFrame>
 					</td>
 					<td className="documentArea">

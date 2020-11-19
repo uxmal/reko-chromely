@@ -7,51 +7,107 @@ type ProcedureListItem = {
 }
 
 type ProcedureListState = {
-    procs : ProcedureListItem[]
+    procs : ProcedureListItem[],
+    filter: string,
+    procsFetched: boolean
 }
 
-export class ProcedureList extends React.Component<{}, ProcedureListState>
+type ProcedureProps = {
+    procData: ProcedureListItem,
+    filter: string
+}
+
+export class Procedure extends React.Component<ProcedureProps, {}>{
+    private ref:React.RefObject<HTMLDivElement>;
+
+    public constructor(props:ProcedureProps){
+        super(props);
+        this.ref = React.createRef();
+    }
+
+    render(){
+        let proc = this.props.procData;
+        return <div 
+                ref={this.ref}
+                className="item"
+                key={proc.sAddress}
+                style={{
+                    display: (proc.name.includes(this.props.filter)) ? 'inherit' : 'none'
+                }}
+                data-addr={proc.sAddress}>{proc.name}</div>
+    }
+}
+
+export type ProcedureListProps = {
+    scanned: boolean
+}
+
+export class ProcedureList extends React.Component<ProcedureListProps, ProcedureListState>
 {
     public constructor(props:any)
     {
         super(props);
         this.state = {
-            procs: []
+            procs: [],
+            filter: '',
+            procsFetched: false
         };
     }
 
     onFilterTextChanged(e: React.ChangeEvent<HTMLInputElement>) {
-        this.fetchProcedureList(e.target.value);
+        this.setState({
+            filter: e.target.value
+        });
     }
 
-    async fetchProcedureList(filter: string) {
-        console.log("ProcedureList: fetching procedure list...");
-        let jsProcs = await window.reko.GetProcedureList(filter);
-        let procs = JSON.parse(jsProcs);
-        console.log("ProcedureList: received " + procs.length + " procedures");
+    async componentDidMount(){
+        let procs = await this.fetchProcedureList();
         this.setState({
             procs: procs
         });
     }
 
+    async fetchProcedureList() {
+        console.log("ProcedureList: fetching procedure list...");
+        let jsProcs = await window.reko.GetProcedureList('');
+        let newProcs = JSON.parse(jsProcs);
+        console.log(`ProcedureList: received ${newProcs.length} procedures`);
+        return newProcs;
+    }
+
+    async componentDidUpdate(){
+        if(this.props.scanned){
+            if(!this.state.procsFetched){
+                // scanned, but not fetched. go fetch 'em
+                let procs = await this.fetchProcedureList();
+                this.setState({
+                    procs: procs,
+                    procsFetched: true
+                });
+            }
+        } else if(this.state.procsFetched) {
+            // not scanned, and we had fetched procedures
+            // reset state to fetch procedures again
+            this.setState({
+                procs: [],
+                procsFetched: false,
+            });
+        }
+    }
+
     render() {
-        if (this.state === null || this.state.procs === null)
+        if (!this.state.procsFetched)
         {
             return <div>No procedures available.</div>;
         }
-        else
+
+        let procs = this.state.procs.map(pitem =>
         {
-            let procs = this.state.procs.map(pitem =>
-            {
-                return <div 
-                    className="item"
-                    key={pitem.sAddress}
-                    data-addr={pitem.sAddress}>{pitem.name}</div>
-            });
-            return <div className="procedureList">
-                <input type="text" onChange={this.onFilterTextChanged.bind(this)} />
-                {procs}
-            </div>
-        }
+            return <Procedure key={pitem.sAddress} procData={pitem} filter={this.state.filter} />
+        });
+        return <div className="procedureList">
+            <input type="text" onChange={this.onFilterTextChanged.bind(this)} />
+            {procs}
+        </div>
     }
 }
