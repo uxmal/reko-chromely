@@ -85,6 +85,7 @@ namespace Reko.Chromely.BrowserHost
             services.AddService(typeof(IConfigurationService), configSvc);
             services.AddService(typeof(IDecompiledFileService), dfSvc);
             services.AddService(typeof(ITypeLibraryLoaderService), new TypeLibraryLoaderServiceImpl(services));
+            services.AddService(typeof(IPluginLoaderService), new PluginLoaderService());
             var loader = new Reko.Loading.Loader(services);
             return new Reko.Decompiler(loader, services);
         }

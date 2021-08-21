@@ -85,7 +85,7 @@ class App extends React.Component<{},AppState> {
 		if(this.state.filePath == null){
 			return;
 		}
-		let result = await window.reko.LoadFile(this.state.filePath, null);
+		let result = await window.reko.LoadFile(this.state.filePath, null, null);
 		if(!result){
 			return;
 		}

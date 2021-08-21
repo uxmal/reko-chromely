@@ -46,7 +46,7 @@ namespace Reko.Chromely.UnitTests.Utilities
 
         public Program Program { get; set; }
 
-        public void Add(Procedure proc, Procedure_v1 userProc = null)
+        public void Add(Procedure proc, UserProcedure userProc = null)
         {
             ++procCount;
             var addr = Address.Ptr32(procCount * 0x1000u);
@@ -59,7 +59,7 @@ namespace Reko.Chromely.UnitTests.Utilities
             }
         }
 
-        private string GuessName(Procedure_v1 userProc, Procedure proc = null)
+        private string GuessName(UserProcedure userProc, Procedure proc = null)
         {
             if (userProc != null)
             {
@@ -98,10 +98,16 @@ namespace Reko.Chromely.UnitTests.Utilities
 
         public Procedure Add(string procName, Action<ProcedureBuilder> testCodeBuilder)
         {
-            return Add(new Procedure_v1 { Name = procName }, testCodeBuilder);
+            return Add(
+                new UserProcedure(
+                    Address.FromConstant(Constant.Zero(Program.Architecture.WordWidth)),
+                    procName
+                ),
+                testCodeBuilder
+            );
         }
 
-        public Procedure Add(Procedure_v1 userProc, Action<ProcedureBuilder> testCodeBuilder)
+        public Procedure Add(UserProcedure userProc, Action<ProcedureBuilder> testCodeBuilder)
         {
             var mock = new ProcedureBuilder(Program.Architecture, GuessName(userProc));
             mock.ProgramBuilder = this;

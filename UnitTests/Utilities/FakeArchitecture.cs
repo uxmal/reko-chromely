@@ -21,6 +21,7 @@
 using NUnit.Framework;
 using Reko.Core;
 using Reko.Core.Code;
+using Reko.Core.Emulation;
 using Reko.Core.Expressions;
 using Reko.Core.Lib;
 using Reko.Core.Machine;
@@ -52,7 +53,7 @@ namespace Reko.Chromely.UnitTests.Utilities
         private const int iStackRegister = 63;
         private const int iReturnRegister = 62;
 
-        public FakeArchitecture(IServiceProvider services) : base(services, "fake")
+        public FakeArchitecture(IServiceProvider services) : base(services, "fake", new Dictionary<string, object>())
         {
             this.CarryFlagMask = (uint)StatusFlags.C;
             this.Description = "Fake Architecture for testing";
@@ -186,11 +187,6 @@ namespace Reko.Chromely.UnitTests.Utilities
             }
         }
 
-        public override RegisterStorage GetSubregister(RegisterStorage reg, int offset, int width)
-        {
-            return reg;
-        }
-
         public override RegisterStorage[] GetRegisters()
         {
             return registers;
@@ -289,22 +285,6 @@ namespace Reko.Chromely.UnitTests.Utilities
             return Address.SegPtr(seg.ToUInt16(), offset.ToUInt16());
         }
 
-        public override IEnumerable<RegisterStorage> GetAliases(RegisterStorage reg)
-        {
-            yield return reg;
-        }
-
-        public override RegisterStorage GetWidestSubregister(RegisterStorage reg, HashSet<RegisterStorage> bits)
-        {
-            ulong mask = bits.Where(b => b.OverlapsWith(reg)).Aggregate(0ul, (a, r) => a | r.BitMask);
-            return mask != 0 ? reg : null;
-        }
-
-        public override void RemoveAliases(ISet<RegisterStorage> ids, RegisterStorage reg)
-        {
-            ids.Remove(reg);
-        }
-
         public override void LoadUserOptions(Dictionary<string, object> options)
         {
             throw new NotImplementedException();
@@ -366,7 +346,7 @@ namespace Reko.Chromely.UnitTests.Utilities
 
     public class FakeArchitecture64 : ProcessorArchitecture
     {
-        public FakeArchitecture64(IServiceProvider services) : base(services, "fakeArch64")
+        public FakeArchitecture64(IServiceProvider services) : base(services, "fakeArch64", new Dictionary<string, object>())
         {
             Endianness = EndianServices.Little;
             FramePointerType = PrimitiveType.Ptr64;
@@ -502,7 +482,7 @@ namespace Reko.Chromely.UnitTests.Utilities
         {
             if (!regValues.TryGetValue(r, out Constant c))
             {
-                c = Constant.Invalid;
+                c = InvalidConstant.Create(r.DataType);
             }
             return c;
         }

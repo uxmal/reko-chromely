@@ -148,5 +148,12 @@ namespace Reko.Chromely.Renderers
             sb.Append(HtmlEncode(typeName));
             sb.Append("</span>");
         }
+
+        public override void WriteLabel(string label, object block)
+        {
+            sb.AppendFormat("<span class='label'>");
+            sb.Append(HtmlEncode(label));
+            sb.Append("</span>");
+        }
     }
 }

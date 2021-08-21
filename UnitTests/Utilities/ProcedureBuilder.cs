@@ -121,7 +121,7 @@ namespace Reko.Chromely.UnitTests.Utilities
 
         public CallInstruction Call(string procedureName, int retSizeOnStack)
         {
-            var ci = new CallInstruction(Constant.Invalid, new CallSite(retSizeOnStack, 0));
+            var ci = new CallInstruction(InvalidConstant.Create(Architecture.WordWidth), new CallSite(retSizeOnStack, 0));
             unresolvedProcedures.Add(new ProcedureConstantUpdater(procedureName, ci));
             Emit(ci);
             return ci;
@@ -160,7 +160,7 @@ namespace Reko.Chromely.UnitTests.Utilities
                IEnumerable<Identifier> uses,
                IEnumerable<Identifier> definitions)
         {
-            var ci = new CallInstruction(Constant.Invalid, new CallSite(retSizeOnStack, 0));
+            var ci = new CallInstruction(InvalidConstant.Create(Architecture.WordWidth), new CallSite(retSizeOnStack, 0));
             ci.Uses.UnionWith(uses.Select(u => new CallBinding(u.Storage, u)));
             ci.Definitions.UnionWith(definitions.Select(d => new CallBinding(d.Storage, d)));
             unresolvedProcedures.Add(new ProcedureConstantUpdater(procedureName, ci));
@@ -173,7 +173,7 @@ namespace Reko.Chromely.UnitTests.Utilities
             IEnumerable<(Storage stg, Expression e)> uses,
             IEnumerable<(Storage stg, Identifier e)> definitions)
         {
-            var ci = new CallInstruction(Constant.Invalid, new CallSite(retSizeOnStack, 0));
+            var ci = new CallInstruction(InvalidConstant.Create(Architecture.WordWidth), new CallSite(retSizeOnStack, 0));
             ci.Uses.UnionWith(uses.Select(u => new CallBinding(u.stg, u.e)));
             ci.Definitions.UnionWith(definitions.Select(d => new CallBinding(d.stg, d.e)));
             unresolvedProcedures.Add(new ProcedureConstantUpdater(procedureName, ci));
@@ -224,7 +224,7 @@ namespace Reko.Chromely.UnitTests.Utilities
         public Application Fn(string name, params Expression[] exps)
         {
             Application appl = new Application(
-                new ProcedureConstant(PrimitiveType.Ptr32, new PseudoProcedure(name, VoidType.Instance, 0)),
+                new ProcedureConstant(PrimitiveType.Ptr32, new IntrinsicProcedure(name, true, VoidType.Instance, 0)),
                 PrimitiveType.Word32, exps);
             unresolvedProcedures.Add(new ApplicationUpdater(name, appl));
             return appl;

@@ -25,6 +25,7 @@ using Chromely.Core;
 using Chromely.Core.Configuration;
 using Reko.Chromely.BrowserHost;
 using Reko.Core;
+using Reko.Core.Scripts;
 using Reko.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -226,6 +227,11 @@ namespace Reko.Chromely.RekoHosting
         public void Warn(string format, params object[] args)
         {
             Error(new NullCodeLocation(""), string.Format(format, args));
+        }
+
+        public void Error(ScriptError scriptError)
+        {
+            Error(new NullCodeLocation(scriptError.FileName), $"{scriptError.LineNumber}:{scriptError.Message}");
         }
 
         public void Warn(ICodeLocation location, string message)

@@ -142,7 +142,7 @@ namespace Reko.Chromely.BrowserHost
                 RegisterAsyncFunction(rekoObj, "OpenFile", new OpenFileHandler(promiseFactory, pendingPromises));
 				RegisterAsyncFunction(rekoObj, "Proto_DisassembleRandomBytes", new Func<string,string,string>(Proto_DisassembleRandomBytes.Execute));
                 RegisterAsyncFunction(rekoObj, "Proto_GeneratePng", new Func<int,byte[]>(Proto_GeneratePng.Execute));
-                RegisterAsyncFunction(rekoObj, "LoadFile", new Func<string, string, bool>(decompiler.Load));
+                RegisterAsyncFunction(rekoObj, "LoadFile", new Func<string, string?, Address?, bool>(decompiler.Load));
                 RegisterAsyncFunction(rekoObj, "Scan", new Action(decompiler.ScanPrograms));
                 RegisterAsyncFunction(rekoObj, "DumpBytes", new Func<string, string, long, string>(dumpBytesFn.Execute));
                 RegisterAsyncFunction(rekoObj, "GetProcedureList", new Func<string, string>(procListRenderer.Render));

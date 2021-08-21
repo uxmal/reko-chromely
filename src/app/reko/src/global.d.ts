@@ -2,7 +2,8 @@
 interface RegisterEventListenerInterface { (eventName: string, eventHandler: Function) }
 interface DisassembleRandomBytesInterface { (address: string, otherArg: string) }
 interface OpenFileInterface { (): string }
-interface LoadFileInterface { (filePath: string, loader: string? = null) : boolean; }
+// $TODO: address is not serializable
+interface LoadFileInterface { (filePath: string, loader: string? = null, address: object? = null) : boolean; }
 interface RenderProjectViewInterface { (): string }
 interface ScanImagesInterface { ():any }
 // $TODO: should return a JSON Array

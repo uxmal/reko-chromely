@@ -15,7 +15,7 @@
             try {
                 e.preventDefault();
                 var filePath = await window.reko.OpenFile();
-                await window.reko.LoadFile(filePath, null);    // Ask Reko to load the file.
+                await window.reko.LoadFile(filePath, null, null);    // Ask Reko to load the file.
                 // updateAllWindows();                         // Now we can pull objects from the Reko instance (procedures, segments)
                 // it would also update the image map, the "heat map" etc. But one thing at a time.
                 loadProjectBrowser();

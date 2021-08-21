@@ -45,7 +45,7 @@ namespace Reko.Chromely.BrowserHost.Functions
             var buf = new byte[100];
             rnd.NextBytes(buf);
             var mem = new ByteMemoryArea(Address.Ptr32(0x00123400), buf);
-            var arch = new X86ArchitectureFlat32(new ServiceContainer(), "x86-protected-32");
+            var arch = new X86ArchitectureFlat32(new ServiceContainer(), "x86-protected-32", new Dictionary<string, object>());
             var rdr = arch.Endianness.CreateImageReader(mem, mem.BaseAddress);
             var dasm = arch.CreateDisassembler(rdr);
             var sw = new StringWriter();
