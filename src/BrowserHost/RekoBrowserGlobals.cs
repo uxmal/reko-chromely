@@ -153,6 +153,15 @@ namespace Reko.Chromely.BrowserHost
                 }));
                 RegisterFunction(rekoObj, "RegisterEventListener", new Proto_RegisterEventListener(eventListeners));
                 RegisterFunction(rekoObj, "RenderProjectView", new Func<string>(() => ProjectViewRenderer.RenderToHtml(decompiler)));
+                RegisterFunction(rekoObj, "RenderProcedure", new Func<CefV8Value, CefV8Value>((CefV8Value key) =>
+                {
+                    var iKey = key.GetIntValue();
+                    var proc = new ProcedureViewModel(iKey);
+                    var obj = CefV8Value.CreateObject();
+                    obj.SetValue("name", CefV8Value.CreateString(proc.Name));
+                    obj.SetValue("body", CefV8Value.CreateString(proc.Body));
+                    return obj;
+                }));
             });
 		}
 	}

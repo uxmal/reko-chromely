@@ -9,6 +9,7 @@ interface ScanImagesInterface { ():any }
 // $TODO: should return a JSON Array
 interface DumpBytesInterface { (programName: string, address: string, length: number): string }
 interface GetProcedureListInterface { (filter:string):any}
+interface RenderProcedureInterface { (key:number):object }
 
 type RekoObject = {
 	RegisterEventListener: RegisterEventListenerInterface,
@@ -19,6 +20,7 @@ type RekoObject = {
 	DumpBytes: DumpBytesInterface,
 	Scan: ScanImagesInterface,
 	GetProcedureList: GetProcedureListInterface,
+	RenderProcedure: RenderProcedureInterface
 }
 
 interface Window {

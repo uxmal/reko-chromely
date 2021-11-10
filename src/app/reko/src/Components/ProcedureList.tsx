@@ -1,4 +1,6 @@
 import React, { ReactHTML } from 'react';
+import { AutoSizer, CellMeasurer, CellMeasurerCache, Grid, GridCellProps } from 'react-virtualized';
+import { CellMeasurerChildProps } from 'react-virtualized/dist/es/CellMeasurer';
 
 type ProcedureListItem = {
     sProgram : string;
@@ -44,6 +46,13 @@ export type ProcedureListProps = {
 
 export class ProcedureList extends React.Component<ProcedureListProps, ProcedureListState>
 {
+    private readonly cache = new CellMeasurerCache({
+        minWidth: 75,
+        defaultWidth: 200,
+        fixedHeight: false,
+        fixedWidth: false
+    });
+
     public constructor(props:any)
     {
         super(props);
@@ -95,19 +104,50 @@ export class ProcedureList extends React.Component<ProcedureListProps, Procedure
         }
     }
 
+    private renderProcedure(props: GridCellProps){
+        var proc = this.state.procs[props.rowIndex];
+
+        return <CellMeasurer
+            cache={this.cache}
+            columnIndex={props.columnIndex}
+            key={props.key}
+            parent={props.parent}
+            rowIndex={props.rowIndex}
+        >
+            {
+            (childProps: CellMeasurerChildProps) => (
+                    <div
+                        ref={childProps.registerChild as any}
+                        style={props.style}
+                    >
+                        <Procedure
+                            key={proc.sAddress}
+                            procData={proc}
+                            filter={this.state.filter}></Procedure>
+                    </div>
+                )
+            }
+        </CellMeasurer>
+    }
+
     render() {
         if (!this.state.procsFetched)
         {
             return <div>No procedures available.</div>;
         }
 
-        let procs = this.state.procs.map(pitem =>
-        {
-            return <Procedure key={pitem.sAddress} procData={pitem} filter={this.state.filter} />
-        });
-        return <div className="procedureList">
-            <input type="text" onChange={this.onFilterTextChanged.bind(this)} />
-            {procs}
-        </div>
+        return <Grid 
+            columnWidth={this.cache.columnWidth}
+            rowHeight={this.cache.rowHeight}
+            deferredMeasurementCache={this.cache}
+            cellRenderer={this.renderProcedure.bind(this)}
+            rowCount={this.state.procs.length}
+            columnCount={1}
+            height={400}
+            width={400}
+            autoHeight={true}
+            autoWidth={true}
+            autoContainerWidth={true}
+        />
     }
 }

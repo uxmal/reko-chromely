@@ -39,6 +39,7 @@ namespace Reko.Chromely.BrowserHost
                 return CefV8Value.CreateNull();
             return value switch
             {
+                CefV8Value v => v,
                 string s => CefV8Value.CreateString(s),
                 bool b => CefV8Value.CreateBool(b),
                 Exception ex => MakeJsRejection(ex),
