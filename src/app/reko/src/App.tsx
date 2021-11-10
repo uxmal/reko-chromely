@@ -17,6 +17,7 @@ import { BytesDumpView } from './Components/BytesDumpView';
 import { IServiceProvider } from './Services/IServiceProvider';
 import { ServiceContainer } from './Services/ServiceContainer';
 import { IServiceContainer } from './Services/IServiceContainer';
+import { CodeDataView } from './Components/CodeDataView';
 
 type AppState = {
 	diagnosticMessages: JSX.Element[],
@@ -170,6 +171,12 @@ class App extends React.Component<{},AppState> {
 
 						<DocumentWindowFrame title="Disassembly">
 							<RekoDisassemblyView content={this.state.dasmContent} />
+						</DocumentWindowFrame>
+
+						<DocumentWindowFrame title="Procedure View">
+							<CodeDataView
+								services={this.state.serviceProvider}
+							/>
 						</DocumentWindowFrame>
 					</td>
 				</tr>

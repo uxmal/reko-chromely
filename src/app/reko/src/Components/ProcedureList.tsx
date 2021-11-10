@@ -1,7 +1,9 @@
 import React, { LegacyRef, ReactHTML, RefObject } from 'react';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, Grid, GridCellProps } from 'react-virtualized';
 import { CellMeasurerChildProps } from 'react-virtualized/dist/es/CellMeasurer';
+import { ICodeDataView } from '../Services/ICodeDataView';
 import { IServiceProvider } from '../Services/IServiceProvider';
+import { ServiceConstants } from '../Services/ServiceConstants';
 
 type ProcedureListItem = {
     sProgram : string;
@@ -139,6 +141,13 @@ export class ProcedureList extends React.Component<ProcedureListProps, Procedure
         e.preventDefault();
         
         const procAddr = procNode.getAttribute("data-addr");
+        if(!procAddr){
+            return;
+        }
+
+        this.props.services
+            .requireService<ICodeDataView>(ServiceConstants.ICodeDataView)
+            .showProcedure(procAddr);
     }
 
     render() {

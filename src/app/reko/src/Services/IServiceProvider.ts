@@ -1,4 +1,4 @@
 export interface IServiceProvider {
-	requireService(serviceId: string): object
-	getService(serviceId: string): object|null
+	requireService<T extends object>(serviceId: string): T
+	getService<T extends object>(serviceId: string): T|null
 }
