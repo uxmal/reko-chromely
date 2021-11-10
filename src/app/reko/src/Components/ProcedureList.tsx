@@ -1,6 +1,7 @@
-import React, { ReactHTML } from 'react';
+import React, { LegacyRef, ReactHTML, RefObject } from 'react';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, Grid, GridCellProps } from 'react-virtualized';
 import { CellMeasurerChildProps } from 'react-virtualized/dist/es/CellMeasurer';
+import { IServiceProvider } from '../Services/IServiceProvider';
 
 type ProcedureListItem = {
     sProgram : string;
@@ -16,7 +17,7 @@ type ProcedureListState = {
 
 type ProcedureProps = {
     procData: ProcedureListItem,
-    filter: string
+    filter: string,
 }
 
 export class Procedure extends React.Component<ProcedureProps, {}>{
@@ -36,11 +37,13 @@ export class Procedure extends React.Component<ProcedureProps, {}>{
                 style={{
                     display: (proc.name.includes(this.props.filter)) ? 'inherit' : 'none'
                 }}
-                data-addr={proc.sAddress}>{proc.name}</div>
+                data-addr={proc.sAddress}>{proc.name}
+        </div>
     }
 }
 
 export type ProcedureListProps = {
+    services: IServiceProvider
     scanned: boolean
 }
 
@@ -130,24 +133,37 @@ export class ProcedureList extends React.Component<ProcedureListProps, Procedure
         </CellMeasurer>
     }
 
+    onClick(e: React.UIEvent<HTMLElement>){
+        const procNode = e.target as HTMLDivElement
+        if(!procNode) return
+        e.preventDefault();
+        
+        const procAddr = procNode.getAttribute("data-addr");
+    }
+
     render() {
         if (!this.state.procsFetched)
         {
             return <div>No procedures available.</div>;
         }
 
-        return <Grid 
-            columnWidth={this.cache.columnWidth}
-            rowHeight={this.cache.rowHeight}
-            deferredMeasurementCache={this.cache}
-            cellRenderer={this.renderProcedure.bind(this)}
-            rowCount={this.state.procs.length}
-            columnCount={1}
-            height={400}
-            width={400}
-            autoHeight={true}
-            autoWidth={true}
-            autoContainerWidth={true}
-        />
+        return <div
+                className={"grid-container"}
+                onClick={this.onClick.bind(this)}
+            >
+            <Grid 
+                columnWidth={this.cache.columnWidth}
+                rowHeight={this.cache.rowHeight}
+                deferredMeasurementCache={this.cache}
+                cellRenderer={this.renderProcedure.bind(this)}
+                rowCount={this.state.procs.length}
+                columnCount={1}
+                height={400}
+                width={400}
+                autoHeight={true}
+                autoWidth={true}
+                autoContainerWidth={true}
+            />
+        </div>
     }
 }

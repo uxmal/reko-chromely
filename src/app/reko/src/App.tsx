@@ -14,6 +14,9 @@ import './css/reko.css';
 
 import { ProjectView } from './Components/ProjectView';
 import { BytesDumpView } from './Components/BytesDumpView';
+import { IServiceProvider } from './Services/IServiceProvider';
+import { ServiceContainer } from './Services/ServiceContainer';
+import { IServiceContainer } from './Services/IServiceContainer';
 
 type AppState = {
 	diagnosticMessages: JSX.Element[],
@@ -21,21 +24,30 @@ type AppState = {
 	projectViewContent: string,
 	filePath: string|null,
 	loaded: boolean,
-	scanned: boolean
+	scanned: boolean,
+	serviceProvider: IServiceProvider
 };
 
 class App extends React.Component<{},AppState> {
-
 	constructor(props:any){
 		super(props);
+
+		const svcContainer = this.createServiceContainer();
+
 		this.state = {
 			diagnosticMessages: [],
 			dasmContent: "",
 			projectViewContent: "",
 			filePath: null,
 			loaded: false,
-			scanned: false
+			scanned: false,
+			serviceProvider: svcContainer
 		};
+	}
+
+	createServiceContainer() : IServiceProvider {
+		var container = new ServiceContainer();
+		return container;
 	}
 
 	componentDidMount(){
@@ -142,7 +154,10 @@ class App extends React.Component<{},AppState> {
 					</td>
 					<td id="procedureList">
 						<ToolWindowFrame title="Procedure List">
-							<ProcedureList scanned={this.state.scanned} />
+							<ProcedureList
+								services={this.state.serviceProvider}
+								scanned={this.state.scanned}
+							/>
 						</ToolWindowFrame>
 					</td>
 					<td className="documentArea">
