@@ -24,7 +24,10 @@
 using Reko.Chromely.RekoHosting;
 using Reko.Core;
 using Reko.Core.Configuration;
+using Reko.Core.Loading;
 using Reko.Core.Services;
+using Reko.Loading;
+using Reko.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -78,16 +81,17 @@ namespace Reko.Chromely.BrowserHost
         {
             var fsSvc = new FileSystemServiceImpl();
             var listener = new ListenerService(context, eventListeners);
-            var dfSvc = new DecompiledFileService(fsSvc, listener);
-            services.AddService(typeof(IFileSystemService), fsSvc);
-            services.AddService(typeof(DecompilerEventListener), listener);
+            var dfSvc = new DecompiledFileService(services, fsSvc, listener);
+            services.AddService<IFileSystemService>(fsSvc);
+            services.AddService<DecompilerEventListener>(listener);
             var configSvc = RekoConfigurationService.Load(services, "reko/reko.config");
-            services.AddService(typeof(IConfigurationService), configSvc);
-            services.AddService(typeof(IDecompiledFileService), dfSvc);
-            services.AddService(typeof(ITypeLibraryLoaderService), new TypeLibraryLoaderServiceImpl(services));
-            services.AddService(typeof(IPluginLoaderService), new PluginLoaderService());
-            var loader = new Reko.Loading.Loader(services);
-            return new Reko.Decompiler(loader, services);
+            services.AddService<IConfigurationService>(configSvc);
+            services.AddService<IDecompiledFileService>(dfSvc);
+            services.AddService<ITypeLibraryLoaderService>(new TypeLibraryLoaderServiceImpl(services));
+            services.AddService<IPluginLoaderService>(new PluginLoaderService());
+            services.AddService<ILoader>(new Loader(services));
+            var project = new Project();
+            return new Reko.Decompiler(project, services);
         }
 
         protected override bool OnProcessMessageReceived(CefBrowser browser, CefFrame frame, CefProcessId sourceProcess, CefProcessMessage message)

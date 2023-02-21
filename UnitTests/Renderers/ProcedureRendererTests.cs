@@ -83,10 +83,10 @@ namespace Reko.Chromely.UnitTests.Renderers
         {
             var sExp =
             #region Expected
-@"ProcRnd_IR_QuoteString_entry:<br />
-l1:<br />
+@"<span class='label'>ProcRnd_IR_QuoteString_entry</span>:<br />
+<span class='label'>l1</span>:<br />
 	Mem0[0x00123400:(str char)] = &quot;&lt;Up &amp; down&gt;&quot;<br />
-ProcRnd_IR_QuoteString_exit:<br />
+<span class='label'>ProcRnd_IR_QuoteString_exit</span>:<br />
 ";
             #endregion
 

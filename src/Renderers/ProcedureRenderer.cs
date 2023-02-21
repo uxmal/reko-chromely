@@ -155,5 +155,9 @@ namespace Reko.Chromely.Renderers
             sb.Append(HtmlEncode(label));
             sb.Append("</span>");
         }
+
+        public override void Begin(object? tag)
+        {
+        }
     }
 }
