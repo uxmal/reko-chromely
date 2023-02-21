@@ -47,7 +47,7 @@ namespace Reko.Chromely.Renderers
                 .Select(program => program.Procedures.Values
                     .Select(proc => new ProcedureListItem
                     {
-                        sProgram = program.Filename,
+                        sProgram = program.Location.FilesystemPath,
                         sAddress = proc.EntryAddress.ToString(),
                         name = proc.Name
                     }))

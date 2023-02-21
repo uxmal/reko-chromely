@@ -53,7 +53,12 @@ namespace Reko.Chromely.UnitTests.Utilities
         private const int iStackRegister = 63;
         private const int iReturnRegister = 62;
 
-        public FakeArchitecture(IServiceProvider services) : base(services, "fake", new Dictionary<string, object>())
+        public FakeArchitecture(IServiceProvider services) : base(
+            services, "fake",
+            new Dictionary<string, object>(),
+            new Dictionary<string, RegisterStorage>(),
+            new Dictionary<StorageDomain, RegisterStorage>()
+        )
         {
             this.CarryFlagMask = (uint)StatusFlags.C;
             this.Description = "Fake Architecture for testing";
@@ -310,7 +315,7 @@ namespace Reko.Chromely.UnitTests.Utilities
             FrameApplicationBuilder>
                 Test_CreateFrameApplicationBuilder =
                     (arch, binder, site, callee) =>
-                    new FrameApplicationBuilder(arch, binder, site, callee, false);
+                    new FrameApplicationBuilder(arch, binder, site, callee);
         public override FrameApplicationBuilder CreateFrameApplicationBuilder(IStorageBinder binder, CallSite site, Expression callee)
         {
             return Test_CreateFrameApplicationBuilder(this, binder, site, callee);
@@ -346,7 +351,13 @@ namespace Reko.Chromely.UnitTests.Utilities
 
     public class FakeArchitecture64 : ProcessorArchitecture
     {
-        public FakeArchitecture64(IServiceProvider services) : base(services, "fakeArch64", new Dictionary<string, object>())
+        public FakeArchitecture64(IServiceProvider services) : base(
+            services,
+            "fakeArch64",
+            new Dictionary<string, object>(),
+            new Dictionary<string, RegisterStorage>(),
+            new Dictionary<StorageDomain, RegisterStorage>()
+        )
         {
             Endianness = EndianServices.Little;
             FramePointerType = PrimitiveType.Ptr64;

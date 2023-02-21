@@ -4,6 +4,10 @@ using System;
 using System.Linq;
 using Reko.Chromely.Renderers;
 using Reko.Core.Memory;
+using System.ComponentModel.Design;
+using Reko.Arch.X86;
+using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 
 namespace Reko.Chromely.UnitTests
 {
@@ -13,8 +17,16 @@ namespace Reko.Chromely.UnitTests
 		private Program program;
 
 		private void Given_Program() {
-			this.program = new Program();
-		}
+			var sc = new ServiceContainer();
+			var options = new Dictionary<string, object>();
+			var cpu = new X86ArchitectureFlat32(sc, "x86-protected-32", options);
+			var platform = new Environments.Windows.Win32Platform(sc, cpu);
+
+			this.program = new Program()
+			{
+				Platform = platform
+			};
+        }
 
 		private void Given_Data(uint uAddress, byte[] bytes) {
 			var mem = new ByteMemoryArea(Address.Ptr32(uAddress), bytes);

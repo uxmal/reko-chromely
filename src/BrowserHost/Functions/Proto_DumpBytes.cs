@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualBasic.CompilerServices;
 using Reko.Chromely.Renderers;
-using Reko.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;

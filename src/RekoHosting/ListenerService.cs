@@ -25,11 +25,13 @@ using Chromely.Core;
 using Chromely.Core.Configuration;
 using Reko.Chromely.BrowserHost;
 using Reko.Core;
+using Reko.Core.Output;
 using Reko.Core.Scripts;
 using Reko.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Xilium.CefGlue;
 
 namespace Reko.Chromely.RekoHosting
@@ -78,6 +80,14 @@ namespace Reko.Chromely.RekoHosting
         private CefV8Context ctx;
 
         private readonly EventListenersRepository eventListeners;
+
+        public IProgressIndicator Progress
+        {
+            get
+            {
+                return NullProgressIndicator.Instance;
+            }
+        }
 
         public ListenerService(CefV8Context ctx, EventListenersRepository eventListeners)
         {
@@ -136,7 +146,7 @@ namespace Reko.Chromely.RekoHosting
 
         public ICodeLocation CreateStatementNavigator(Core.Program program, Statement stm)
         {
-            return new JsLocation(@$"{{""program"":""{program.Name}"",""stmLoc"":""{stm.LinearAddress}""}}");
+            return new JsLocation(@$"{{""program"":""{program.Name}"",""stmLoc"":""{stm.Address}""}}");
         }
 
         public void Error(string message)
@@ -243,7 +253,7 @@ namespace Reko.Chromely.RekoHosting
 
         public void Warn(ICodeLocation location, string message, params object[] args)
         {
-            throw new NotImplementedException();
+            Warn(location, string.Format(message, args));
         }
 
         public class JsLocation : ICodeLocation
@@ -255,9 +265,9 @@ namespace Reko.Chromely.RekoHosting
 
             public string Text { get; }
 
-            public void NavigateTo()
+            public ValueTask NavigateTo()
             {
-                throw new NotSupportedException();
+                throw new NotImplementedException();
             }
         }
 
@@ -296,6 +306,31 @@ namespace Reko.Chromely.RekoHosting
             }
             sb.Append('"');
             return sb.ToString();
+        }
+
+        public ICodeLocation CreateAddressNavigator(IReadOnlyProgram program, Address address)
+        {
+            return new NullCodeLocation("");
+        }
+
+        public ICodeLocation CreateProcedureNavigator(IReadOnlyProgram program, Procedure proc)
+        {
+            return new NullCodeLocation("");
+        }
+
+        public ICodeLocation CreateBlockNavigator(IReadOnlyProgram program, Block block)
+        {
+            return new NullCodeLocation("");
+        }
+
+        public ICodeLocation CreateStatementNavigator(IReadOnlyProgram program, Statement stm)
+        {
+            return new NullCodeLocation("");
+        }
+
+        public ICodeLocation CreateJumpTableNavigator(IReadOnlyProgram program, IProcessorArchitecture arch, Address addrIndirectJump, Address? addrVector, int stride)
+        {
+            return new NullCodeLocation("");
         }
     }
 }

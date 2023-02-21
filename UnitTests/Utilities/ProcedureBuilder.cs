@@ -112,7 +112,7 @@ namespace Reko.Chromely.UnitTests.Utilities
 
             Emit(new Branch(expr, branchBlock));
             TerminateBlock();
-            return b.Statements.Last;
+            return b.Statements.Last();
         }
 
         protected virtual void BuildBody()
@@ -211,9 +211,9 @@ namespace Reko.Chromely.UnitTests.Utilities
         public override Statement Emit(Instruction instr)
         {
             EnsureBlock(null);
-            Block.Statements.Add(LinearAddress, instr);
+            Block.Statements.Add(Address.Ptr32(LinearAddress), instr);
             LinearAddress += (uint)InstructionSize;
-            return Block.Statements.Last;
+            return Block.Statements.Last();
         }
 
         public Identifier Flags(string s)
